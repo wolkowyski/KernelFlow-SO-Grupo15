@@ -10,13 +10,14 @@ from core import (
     PlanificadorSRTF,
     Proceso,
 )
+from ayudas import simular
 
 
 def _simular(procesos):
     memoria = GestorMemoria()
     admision = Admision(procesos, memoria)
     planificador = PlanificadorSRTF(admision, memoria)
-    planificador.simular()
+    simular(planificador)
     return planificador.reloj
 
 

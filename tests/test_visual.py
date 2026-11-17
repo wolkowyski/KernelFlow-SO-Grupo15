@@ -25,6 +25,7 @@ from interfaz import (
     _escala_gantt,
     _repartir,
 )
+from ayudas import simular
 
 
 def _armar(procesos):
@@ -41,13 +42,13 @@ class TestLineaDeTiempo(unittest.TestCase):
     def test_registra_cada_unidad_de_cpu_y_las_ociosas(self):
         procesos = [Proceso("P1", 50, 2, 2), Proceso("P2", 50, 2, 1)]
         _, planificador, _ = _armar(procesos)
-        planificador.simular()
+        simular(planificador)
         self.assertEqual(planificador.linea_tiempo, [None, None, "P2", "P1", "P1"])
 
     def test_demo_coincide_con_la_traza_esperada(self):
         procesos = cargar_procesos(Path("data/procesos_demo.csv"))
         _, planificador, _ = _armar(procesos)
-        planificador.simular()
+        simular(planificador)
         traza = "".join(pid[-1] for pid in planificador.linea_tiempo)
         self.assertEqual(traza, "1222246664444111111155333333333")
 
@@ -117,7 +118,7 @@ class TestPanelVisual(unittest.TestCase):
     def test_fin_muestra_gantt_y_barras(self):
         procesos = cargar_procesos(Path("data/procesos_demo.csv"))
         panel, planificador, _ = _armar(procesos)
-        planificador.simular()
+        simular(planificador)
         salida = io.StringIO()
         with redirect_stdout(salida), mock.patch("interfaz.ancho_terminal", return_value=170):
             panel.mostrar_fin(planificador.reloj)

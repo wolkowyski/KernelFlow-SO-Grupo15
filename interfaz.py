@@ -1410,7 +1410,7 @@ def navegar(pantallas: List[str], inicio: bool = False) -> bool:
                 indice -= 1
         elif tecla in ("f", "F"):
             PANTALLA_FIJA = not PANTALLA_FIJA
-        elif tecla in ("q", "Q", "", "\x1b"):
+        elif tecla in ("q", "Q"):
             return False
         else:
             continue
@@ -1449,7 +1449,7 @@ def cierre(pantallas: Sequence[str], ruta_csv: Path, interactivo: bool) -> int:
         if tecla in ("g", "G") and not guardada:
             exportar(pantallas, ruta_csv)
             guardada = True
-        elif tecla in (" ", "\r", "\n", "q", "Q", "", "\x1b"):
+        elif tecla in (" ", "\r", "\n", "q", "Q"):
             return 0
 
 
@@ -1488,7 +1488,7 @@ def menu_interactivo() -> int:
             input(centrar_linea("Presione Enter para continuar..."))
             continue
 
-        if ejecutar_simulacion(ruta, modo_visual=True) != 0:
+        if ejecutar_simulacion(ruta) != 0:
             input("\n" + centrar_linea("Presione Enter para volver al menu..."))
 
 
@@ -1522,7 +1522,7 @@ def crear_argumentos(argumentos: Optional[Sequence[str]] = None) -> argparse.Nam
     return analizador.parse_args(argumentos)
 
 
-def ejecutar_simulacion(ruta_csv: Path, modo_visual: bool = False) -> int:
+def ejecutar_simulacion(ruta_csv: Path) -> int:
     """Arma la simulacion con los componentes de ``core.py`` y la muestra.
 
     La carga, la memoria, la admision y el planificador son los del nucleo;
@@ -1540,14 +1540,6 @@ def ejecutar_simulacion(ruta_csv: Path, modo_visual: bool = False) -> int:
     except ErrorAdmision as error:
         imprimir_centrado(f"Error: {error}")
         return 1
-    if not modo_visual:
-        presentacion = PresentacionConsola(procesos, admision, memoria)
-        presentacion.mostrar_inicio(ruta_csv)
-        planificador = PlanificadorSRTF(admision, memoria, presentacion.mostrar_evento)
-        planificador.simular()
-        presentacion.mostrar_fin(planificador.reloj)
-        return 0
-
     panel = PanelConsola(procesos, admision, memoria, ESTILO_COMPLETO)
     eventos_paso: List = []
     planificador = PlanificadorConGantt(admision, memoria, eventos_paso.append)
@@ -1597,10 +1589,10 @@ def main(argumentos: Optional[Sequence[str]] = None) -> int:
     EXPORTAR_AL_TERMINAR = opciones.exportar
     try:
         if opciones.archivo is not None:
-            return ejecutar_simulacion(opciones.archivo, modo_visual=True)
+            return ejecutar_simulacion(opciones.archivo)
         if sys.stdin.isatty() and sys.stdout.isatty():
             return menu_interactivo()
-        return ejecutar_simulacion(RUTA_CSV_PREDETERMINADA, modo_visual=True)
+        return ejecutar_simulacion(RUTA_CSV_PREDETERMINADA)
     except (EOFError, KeyboardInterrupt):
         print()
         imprimir_centrado("Simulacion interrumpida.")

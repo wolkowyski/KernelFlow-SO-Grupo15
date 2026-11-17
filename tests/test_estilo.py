@@ -20,6 +20,7 @@ from interfaz import (
     largo_visible,
     PanelConsola,
 )
+from ayudas import simular
 
 
 class TestEstilo(unittest.TestCase):
@@ -99,7 +100,7 @@ class TestPanel(unittest.TestCase):
                 planificador.ejecutar_unidad()
             planificador.procesar_instante()
             panel.mostrar_paso(eventos, planificador.reloj, 1)
-            planificador.simular()
+            simular(planificador)
             panel.mostrar_fin(planificador.reloj)
 
         texto = salida.getvalue()

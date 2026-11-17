@@ -21,6 +21,7 @@ from core import (
     PlanificadorSRTF,
     Proceso,
 )
+from ayudas import avanzar_unidad, simular
 
 
 class TestIntegracion(unittest.TestCase):
@@ -40,7 +41,7 @@ class TestIntegracion(unittest.TestCase):
             memoria,
             lambda evento: grados_observados.append(admision.grado_multiprogramacion()),
         )
-        planificador.simular()
+        simular(planificador)
 
         self.assertTrue(
             all(grado <= GRADO_MAXIMO_MULTIPROGRAMACION for grado in grados_observados)
@@ -59,11 +60,11 @@ class TestIntegracion(unittest.TestCase):
         eventos = []
         planificador = PlanificadorSRTF(admision, memoria, eventos.append)
 
-        planificador.avanzar_unidad()
+        avanzar_unidad(planificador)
         self.assertEqual(segundo.estado, ESTADO_LISTO_SUSPENDIDO)
         self.assertIsNone(memoria.obtener_asignacion(segundo))
 
-        planificador.simular()
+        simular(planificador)
         self.assertEqual(segundo.tiempo_inicio, 2)
         self.assertEqual(segundo.tiempo_finalizacion, 3)
         self.assertTrue(any(evento.tipo == TIPO_NUEVA_ADMISION for evento in eventos))
@@ -79,7 +80,7 @@ class TestIntegracion(unittest.TestCase):
         admision = Admision(procesos, memoria)
         eventos = []
         planificador = PlanificadorSRTF(admision, memoria, eventos.append)
-        planificador.simular()
+        simular(planificador)
 
         apropiaciones = [evento for evento in eventos if evento.tipo == TIPO_APROPIACION]
         self.assertEqual(
@@ -95,7 +96,7 @@ class TestIntegracion(unittest.TestCase):
         admision = Admision([proceso], memoria)
         eventos = []
         planificador = PlanificadorSRTF(admision, memoria, eventos.append)
-        planificador.simular()
+        simular(planificador)
 
         self.assertEqual(
             [evento.tiempo for evento in eventos if evento.tipo == TIPO_CPU_OCIOSA],
@@ -119,7 +120,7 @@ class TestIntegracion(unittest.TestCase):
         eventos = []
         planificador = PlanificadorSRTF(admision, memoria, eventos.append)
 
-        planificador.avanzar_unidad()
+        avanzar_unidad(planificador)
 
         arribos = {
             evento.proceso_id: evento.detalle
@@ -138,7 +139,7 @@ class TestIntegracion(unittest.TestCase):
         eventos = []
         planificador = PlanificadorSRTF(admision, memoria, eventos.append)
 
-        planificador.avanzar_unidad()
+        avanzar_unidad(planificador)
 
         arribo_p2 = next(
             evento for evento in eventos
@@ -153,26 +154,30 @@ class TestIntegracion(unittest.TestCase):
         with redirect_stdout(salida):
             codigo = ejecutar_simulacion(Path("data/procesos_demo.csv"))
 
-        texto = salida.getvalue()
+        # Se unen los espacios porque la salida centra y corta las lineas
+        # segun el ancho de la terminal.
+        texto = " ".join(salida.getvalue().split())
         self.assertEqual(codigo, 0)
-        self.assertIn("t = 0 | P1 llega y pasa a LISTO", texto)
-        self.assertIn("apropia la CPU", texto)
-        self.assertIn("LISTO_SUSPENDIDO: P5", texto)
-        self.assertIn("t = 4 | P5 llega y pasa a LISTO_SUSPENDIDO", texto)
-        self.assertIn("P5 permanece en LISTO_SUSPENDIDO", texto)
-        self.assertIn("fragmentacion externa", texto)
-        self.assertIn("P5 pasa de LISTO_SUSPENDIDO a LISTO", texto)
-        self.assertIn("P1 pasa de EJECUCION a LISTO", texto)
-        self.assertIn("Se libera la memoria", texto)
-        self.assertIn("| ID Part. | Inicio | Tamanio | Proceso | Frag. Int. |", texto)
-        self.assertIn("T. Restante", texto)
-        self.assertIn("Libre usuario: 450K", texto)
-        self.assertIn("Simulacion finalizada en t = 31.", texto)
-        self.assertIn("INFORME ESTADISTICO FINAL", texto)
-        self.assertIn("Tiempo de retorno promedio:   14.00 ut", texto)
-        self.assertIn("Tiempo de espera promedio:    8.83 ut", texto)
-        self.assertIn("Tiempo de respuesta promedio:", texto)
-        self.assertIn("6 trabajos / 31 ut = 0.1935", texto)
+        self.assertIn('COMIENZO DEL PASO 1', texto)
+        self.assertIn('t = 0 | P1 llega y pasa a LISTO', texto)
+        self.assertIn('apropia la CPU', texto)
+        self.assertIn('COLA LISTO_SUSPENDIDO: P5', texto)
+        self.assertIn('t = 4 | P5 llega y pasa a LISTO_SUSPENDIDO', texto)
+        self.assertIn('P5 permanece en LISTO_SUSPENDIDO', texto)
+        self.assertIn('fragmentacion externa', texto)
+        self.assertIn('P5 pasa de LISTO_SUSPENDIDO a LISTO', texto)
+        self.assertIn('P1 pasa de EJECUCION a LISTO', texto)
+        self.assertIn('Se libera la memoria', texto)
+        self.assertIn('| ID Part. | Inicio | Tamanio | Proceso | Frag. Int. |', texto)
+        self.assertIn('T. Restante', texto)
+        self.assertIn('Libre usuario: 450K', texto)
+        self.assertIn('FIN DEL PASO', texto)
+        self.assertIn('SIMULACION FINALIZADA EN t = 31 ut', texto)
+        self.assertIn('INFORME ESTADISTICO FINAL', texto)
+        self.assertIn('Tiempo de retorno promedio: 14.00 ut', texto)
+        self.assertIn('Tiempo de espera promedio: 8.83 ut', texto)
+        self.assertIn('Tiempo de respuesta promedio:', texto)
+        self.assertIn('6 trabajos / 31 ut = 0.1935', texto)
 
     def test_nuevo_sin_cupo_que_pasa_a_suspendido_al_finalizar_se_informa(self):
         # P1..P5 ocupan el cupo; P6 queda en NUEVO. Cuando P5 termina, P6
@@ -189,7 +194,7 @@ class TestIntegracion(unittest.TestCase):
         admision = Admision(procesos, memoria)
         eventos = []
         planificador = PlanificadorSRTF(admision, memoria, eventos.append)
-        planificador.avanzar_unidad()
+        avanzar_unidad(planificador)
 
         detalles = [evento.detalle for evento in eventos]
         self.assertTrue(any("P6 llega y permanece en NUEVO" in d for d in detalles))

@@ -8,6 +8,7 @@ from pathlib import Path
 
 import core
 import interfaz
+from ayudas import simular
 
 RAIZ = Path(__file__).resolve().parent.parent
 LOTES = sorted((RAIZ / "data").glob("*.csv"))
@@ -20,7 +21,7 @@ def _resultado(clase_planificador, ruta):
     admision = core.Admision(procesos, memoria)
     eventos = []
     planificador = clase_planificador(admision, memoria, eventos.append)
-    planificador.simular()
+    simular(planificador)
     tiempos = [
         (p.id, p.tiempo_inicio, p.tiempo_finalizacion, p.estado) for p in procesos
     ]
@@ -42,7 +43,7 @@ class TestSeparacion(unittest.TestCase):
         salida = io.StringIO()
         with redirect_stdout(salida):
             codigo = core.ejecutar_simulacion(
-                RAIZ / "data" / "procesos_demo.csv", modo_visual=True
+                RAIZ / "data" / "procesos_demo.csv"
             )
         self.assertEqual(codigo, 0)
         self.assertNotIn("\x1b[", salida.getvalue())

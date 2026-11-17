@@ -923,16 +923,6 @@ class PlanificadorSRTF:
             ),
         )
 
-    def simular(self) -> None:
-        """Ejecuta automaticamente hasta que admision no tenga trabajo pendiente."""
-        while self.admision.hay_procesos_pendientes():
-            self.avanzar_unidad()
-
-    def avanzar_unidad(self) -> None:
-        """Procesa arribos, reevalua SRTF y avanza una unidad discreta."""
-        self.procesar_instante()
-        self.ejecutar_unidad()
-
     def procesar_instante(self) -> None:
         """Atiende los arribos del instante actual y reevalua la CPU (SRTF).
 
@@ -1293,30 +1283,6 @@ class PresentacionConsola:
         self.procesos = procesos
         self.admision = admision
         self.memoria = memoria
-
-    def mostrar_inicio(self, ruta_csv: Path) -> None:
-        """Informa el archivo cargado antes del primer evento."""
-        print(f"KernelFlow | Procesos cargados desde: {ruta_csv}")
-
-    def mostrar_evento(self, evento: EventoPlanificador) -> None:
-        """Imprime el evento y una instantanea del sistema en ese momento."""
-        print("\n" + "-" * 60)
-        print(f"t = {evento.tiempo} | {evento.detalle}")
-        for linea in self.lineas_resumen(evento.tiempo):
-            print(linea)
-        print("PROCESOS:")
-        print(self.tabla_procesos())
-        print("TABLA DE PARTICIONES DE MEMORIA (KB):")
-        print(self.tabla_memoria())
-
-    def mostrar_fin(self, tiempo: int) -> None:
-        """Cierra la salida y presenta el informe estadistico."""
-        print("\n" + "-" * 60)
-        print(f"Simulacion finalizada en t = {tiempo}.")
-        print(f"Libre usuario: {self.memoria.memoria_libre_total()}K")
-        print()
-        for linea in self.lineas_informe(tiempo):
-            print(linea)
 
     # ------------------------------------------------------------------
     # Construccion de contenido reutilizable por las distintas vistas.
@@ -1786,12 +1752,22 @@ def limpiar_pantalla() -> None:
 
 
 def leer_tecla() -> str:
-    """Lee una sola tecla sin esperar Enter, en Linux y en Windows."""
+    """Lee una sola tecla sin esperar Enter, en Linux y en Windows.
+
+    Las teclas especiales (flechas, F1, Inicio, etc.) envian varios
+    caracteres seguidos; se leen todos y se devuelve ``""`` para que no
+    se tomen como otra tecla ni queden escritos en la siguiente pregunta.
+    """
     if os.name == "nt":
         import msvcrt
 
-        return msvcrt.getwch()
+        tecla = msvcrt.getwch()
+        if tecla in ("\x00", "\xe0"):  # flechas y teclas de funcion
+            msvcrt.getwch()
+            return ""
+        return tecla
 
+    import select
     import termios
     import tty
 
@@ -1799,7 +1775,12 @@ def leer_tecla() -> str:
     configuracion_anterior = termios.tcgetattr(descriptor)
     try:
         tty.setcbreak(descriptor)
-        return sys.stdin.read(1)
+        tecla = os.read(descriptor, 1).decode(errors="ignore")
+        if tecla == "\x1b":  # comienzo de una secuencia de tecla especial
+            while select.select([descriptor], [], [], 0.05)[0]:
+                os.read(descriptor, 32)
+            return ""
+        return tecla
     finally:
         termios.tcsetattr(descriptor, termios.TCSADRAIN, configuracion_anterior)
 
@@ -1823,7 +1804,7 @@ def esperar_tecla_avance() -> bool:
         if tecla in (" ", "\r", "\n", "n", "N"):
             print()
             return True
-        if tecla in ("q", "Q", "", "\x1b"):
+        if tecla in ("q", "Q"):
             print()
             return False
 
@@ -1923,7 +1904,7 @@ def menu_interactivo() -> int:
             input(prefijo_centrado("Presione Enter para continuar..."))
             continue
 
-        ejecutar_simulacion(ruta, modo_visual=True)
+        ejecutar_simulacion(ruta)
         input("\n" + prefijo_centrado("Presione Enter para volver al menu..."))
 
 
@@ -1942,8 +1923,8 @@ def crear_argumentos(argumentos: Optional[Sequence[str]] = None) -> argparse.Nam
     return analizador.parse_args(argumentos)
 
 
-def ejecutar_simulacion(ruta_csv: Path, modo_visual: bool = False) -> int:
-    """Compone los modulos del simulador y ejecuta el ciclo principal."""
+def ejecutar_simulacion(ruta_csv: Path) -> int:
+    """Compone los modulos del simulador y ejecuta la simulacion paso a paso."""
     try:
         procesos = cargar_procesos(ruta_csv)
     except ErrorCargaProcesos as error:
@@ -1956,51 +1937,44 @@ def ejecutar_simulacion(ruta_csv: Path, modo_visual: bool = False) -> int:
     except ErrorAdmision as error:
         imprimir_linea_centrada(f"Error: {error}")
         return 1
-    clase_presentacion = PanelTexto if modo_visual else PresentacionConsola
-    presentacion = clase_presentacion(procesos, admision, memoria)
+    presentacion = PanelTexto(procesos, admision, memoria)
 
     presentacion.mostrar_inicio(ruta_csv)
 
-    if modo_visual:
-        eventos_paso = []
-        planificador = PlanificadorSRTF(admision, memoria, eventos_paso.append)
-        numero_paso = 0
-        interactivo = sys.stdin.isatty() and sys.stdout.isatty()
-        if interactivo:
-            print(
-                "\n" + prefijo_centrado(
-                    "[Espacio/Enter] comenzar la simulacion  [q] volver al menu: "
-                ),
-                end="",
-                flush=True,
-            )
-            if not esperar_tecla_avance():
-                return 0
-        while True:
-            # Los eventos de una finalizacion en t (producidos al ejecutar la
-            # unidad t-1) se muestran junto con los arribos del mismo t.
-            if admision.hay_procesos_pendientes():
-                planificador.procesar_instante()
-            if eventos_paso:
-                numero_paso += 1
-                presentacion.mostrar_paso(
-                    eventos_paso, planificador.reloj, numero_paso
-                )
-                eventos_paso.clear()
-                if interactivo and admision.hay_procesos_pendientes():
-                    if not esperar_avance():
-                        imprimir_linea_centrada(
-                            f"Simulacion detenida en t = {planificador.reloj}."
-                        )
-                        return 0
-            if not admision.hay_procesos_pendientes():
-                break
-            planificador.ejecutar_unidad()
-    else:
-        planificador = PlanificadorSRTF(
-            admision, memoria, presentacion.mostrar_evento
+    eventos_paso = []
+    planificador = PlanificadorSRTF(admision, memoria, eventos_paso.append)
+    numero_paso = 0
+    interactivo = sys.stdin.isatty() and sys.stdout.isatty()
+    if interactivo:
+        print(
+            "\n" + prefijo_centrado(
+                "[Espacio/Enter] comenzar la simulacion  [q] volver al menu: "
+            ),
+            end="",
+            flush=True,
         )
-        planificador.simular()
+        if not esperar_tecla_avance():
+            return 0
+    while True:
+        # Los eventos de una finalizacion en t (producidos al ejecutar la
+        # unidad t-1) se muestran junto con los arribos del mismo t.
+        if admision.hay_procesos_pendientes():
+            planificador.procesar_instante()
+        if eventos_paso:
+            numero_paso += 1
+            presentacion.mostrar_paso(
+                eventos_paso, planificador.reloj, numero_paso
+            )
+            eventos_paso.clear()
+            if interactivo and admision.hay_procesos_pendientes():
+                if not esperar_avance():
+                    imprimir_linea_centrada(
+                        f"Simulacion detenida en t = {planificador.reloj}."
+                    )
+                    return 0
+        if not admision.hay_procesos_pendientes():
+            break
+        planificador.ejecutar_unidad()
 
     presentacion.mostrar_fin(planificador.reloj)
     return 0
@@ -2011,10 +1985,10 @@ def main(argumentos: Optional[Sequence[str]] = None) -> int:
     opciones = crear_argumentos(argumentos)
     try:
         if opciones.archivo is not None:
-            return ejecutar_simulacion(opciones.archivo, modo_visual=True)
+            return ejecutar_simulacion(opciones.archivo)
         if sys.stdin.isatty() and sys.stdout.isatty():
             return menu_interactivo()
-        return ejecutar_simulacion(RUTA_CSV_PREDETERMINADA, modo_visual=True)
+        return ejecutar_simulacion(RUTA_CSV_PREDETERMINADA)
     except (EOFError, KeyboardInterrupt):
         print()
         imprimir_linea_centrada("Simulacion interrumpida.")
