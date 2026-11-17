@@ -14,6 +14,21 @@ proceso.
 Romero, Agustin Nazareno · Seelaff, Mauricio Guillermo · Torres, Alejandro
 Valentin · Wolkowyski, Braian Leonel · Zurano Lang, Lucas Maximiliano.
 
+## Descargas (entrega final)
+
+| Archivo | Qué es |
+|---|---|
+| [`descargas/KernelFlow-linux.zip`](descargas/KernelFlow-linux.zip) | Ejecutable para **Linux** + lotes de prueba + código fuente + HOWTO |
+| [`descargas/KernelFlow-windows.zip`](descargas/KernelFlow-windows.zip) | Ejecutable para **Windows 10/11** + lo mismo |
+| [`docs/Informe_Simulaciones_Grupo15.docx`](docs/Informe_Simulaciones_Grupo15.docx) | Informe con capturas de todos los lotes |
+| [`docs/HOWTO_KernelFlow_Grupo15.docx`](docs/HOWTO_KernelFlow_Grupo15.docx) | Guía de ejecución con capturas |
+| [`HOWTO.md`](HOWTO.md) | Guía rápida de ejecución (texto) |
+
+**Para probarlo rápido:** descargar el ZIP de tu sistema, descomprimirlo y
+abrir `ejecutable/KernelFlow` (Linux: `./KernelFlow` en una terminal) o
+`ejecutable\KernelFlow.exe` (Windows: doble clic). No hace falta instalar
+Python. Para correrlo desde el código: `python3 main.py`.
+
 ## Estructura
 
 ```text
@@ -39,7 +54,8 @@ kernel-flow/
 ├── tests/               # Pruebas automáticas
 ├── docs/                # HOWTO e informe con capturas (Word)
 ├── empaquetar.py        # Genera el ejecutable y el ZIP de entrega
-└── kernelflow.spec      # Configuración de PyInstaller
+├── kernelflow.spec      # Configuración de PyInstaller
+└── descargas/           # Paquetes de entrega listos (Linux y Windows)
 ```
 
 ### Por qué está dividido en `core/` e `interfaz/`
@@ -225,7 +241,7 @@ en Windows.
 - `docs/HOWTO_KernelFlow_Grupo15.docx`: guía de ejecución con capturas.
 - `docs/Informe_Simulaciones_Grupo15.docx`: capturas de cada paso de los
   cinco lotes, validaciones y versión base.
-- [Repositorio en GitHub](https://github.com/wolkowyski/kernel-flow/tree/feature/core-interfaz)
+- [Repositorio en GitHub](https://github.com/wolkowyski/KernelFlow-SO-Grupo15)
 - [Tablero de Trello](https://trello.com/invite/b/660d6768671c589f7fe1ad3c/ATTIfcc43a38988bc5a0fdae81020ef1ac0f450A99A4/so-2026)
   · [Diagrama de flujo (draw.io)](https://drive.google.com/file/d/1SHgLzj9BOfEBwsSJKS4dxIwl1VEnXMCb/view?usp=sharing)
   · [Video Sprint 1](https://youtu.be/IwoRyFjnta0)
