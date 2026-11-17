@@ -1,91 +1,90 @@
 # KernelFlow
 
-Simulador de procesos y memoria por consola para Linux, desarrollado en Python 3.
-Carga hasta 10 procesos desde un CSV, asigna 450K de memoria de usuario con
-MVT y Best-Fit, y planifica la CPU con SRTF apropiativo. Los primeros 100K
-quedan reservados para el sistema operativo.
+Simulador de asignación de memoria y planificación de procesos por consola,
+desarrollado en Python 3 para el TPI de **Sistemas Operativos** (UTN Facultad
+Regional Resistencia, 2026, Comisión K 2.1 Turno Tarde, **Grupo 15**).
 
-## Ejecucion
+Carga hasta 10 procesos desde un CSV, administra 450K de memoria de usuario
+con particiones variables (MVT) y Best-Fit, y planifica la CPU con SRTF
+apropiativo. Los primeros 100K quedan reservados para el sistema operativo.
+La simulación avanza paso a paso: se detiene cada vez que llega o termina un
+proceso.
 
-El programa tiene dos puntos de entrada que usan los mismos modulos:
+**Integrantes:** Bader Soraire, Cain Abel · Gonzalez, Carlos Alfredo · Leiva
+Romero, Agustin Nazareno · Seelaff, Mauricio Guillermo · Torres, Alejandro
+Valentin · Wolkowyski, Braian Leonel · Zurano Lang, Lucas Maximiliano.
 
-- `core/`: el TPI base (`python3 -m core`). Menu simple y simulacion paso a paso en texto
-  (Enter avanza, `q` + Enter vuelve al menu).
-- `interfaz/` (`python3 main.py`): la version completa, con colores, tablas con bordes,
-  graficos, diagrama de Gantt, navegacion entre pasos y exportacion. No
-  contiene logica de simulacion.
+## Estructura
 
-Desde la raiz del proyecto:
-
-```bash
-python3 main.py                # version completa (la del ejecutable)
-python3 -m core                 # version base, solo texto
+```text
+kernel-flow/
+├── main.py              # Arranca la versión completa (la del ejecutable)
+├── core/                # Lógica del simulador: la versión base del TPI
+│   ├── main.py          #   menú simple y ciclo de la simulación paso a paso
+│   ├── proceso.py       #   modelo de proceso
+│   ├── estados.py       #   estados y transiciones permitidas
+│   ├── carga.py         #   lectura y validación del CSV
+│   ├── memoria.py       #   memoria MVT con Best-Fit
+│   ├── admision.py      #   admisión, colas y multiprogramación 5
+│   ├── planificador.py  #   reloj y planificación SRTF
+│   ├── estadisticas.py  #   retorno, espera, promedios y rendimiento
+│   └── presentacion.py  #   salida de texto
+├── interfaz/            # Presentación extra (no forma parte de la consigna)
+│   ├── main.py          #   menú completo, navegación entre pasos y guardado
+│   ├── panel.py         #   tablas, mapa de memoria, gráficos y Gantt
+│   ├── estilo.py        #   colores ANSI y tablas con bordes
+│   ├── entrada.py       #   lectura de teclas y elección del CSV
+│   └── exportar.py      #   guardado en TXT y HTML
+├── data/                # Lotes de prueba
+├── tests/               # Pruebas automáticas
+├── docs/                # HOWTO e informe con capturas (Word)
+├── empaquetar.py        # Genera el ejecutable y el ZIP de entrega
+└── kernelflow.spec      # Configuración de PyInstaller
 ```
 
-Para usar otro archivo:
+La carpeta `core/` no depende de `interfaz/`. La interfaz usa los mismos
+módulos y solo cambia la forma de mostrar el estado.
+
+## Ejecución
+
+Con el ejecutable del paquete de entrega:
 
 ```bash
-python3 main.py   ruta/al/archivo.csv
-python3 -m core ruta/al/archivo.csv
+./KernelFlow            # Linux (carpeta "ejecutable")
+KernelFlow.exe          # Windows (doble clic)
 ```
 
-No se requieren paquetes externos de Python. El archivo predeterminado es
-`data/procesos_demo.csv`.
-
-En la version base el menu tiene una descripcion debajo de cada opcion: `[1]`
-simula el CSV de prueba, `[2]` pide la ruta de otro CSV y `[0]` sale.
-
-En la version completa el menu muestra ademas el logo de la UTN. Al elegir una
-opcion se limpia la pantalla:
-
-- `[1]` simula el CSV de prueba `data/procesos_demo.csv`.
-- `[2]` lista los CSV de `data/` para elegir uno por numero; con `R` se
-  escribe la ruta de otro archivo y con `E` se abre el explorador de archivos
-  (este ultimo requiere `tkinter` y entorno grafico).
-- `[3]` muestra la guia rapida: formato del CSV, reglas, estados, columnas,
-  informe final y controles.
-- `[0]` sale del simulador.
-
-Antes de empezar se muestra la tabla de procesos cargados. Durante la
-simulacion: Espacio/Enter avanza al siguiente cambio, `B` vuelve al paso
-anterior para revisarlo, `F` alterna entre historial y pantalla fija, y `q`
-vuelve al menu. Al terminar, `G` guarda la simulacion en `resultados/` como
-TXT y HTML con colores (o automaticamente con `--exportar`). La opcion 4 del
-menu (o `--pantalla-fija`) elige el modo de pantalla. Funciona en Linux y
-tambien en Windows (`py main.py`).
-
-## Colores, tablas y graficos
-
-Cada paso muestra, ademas de los eventos y las tablas:
-
-- `[SRTF]`: los candidatos ordenados por tiempo restante y el elegido,
-  aclarando cuando hay empate;
-- un **mapa de memoria** proporcional (SO, particiones con un color por
-  proceso y huecos libres), que marca la fragmentacion externa;
-- una **barra de progreso** por proceso y una marca `►` en los que cambiaron
-  de estado en ese paso;
-- el **uso de la CPU** desde `t = 0`.
-
-El informe final suma un grafico de barras de retorno y espera y el
-**diagrama de Gantt** completo.
-
-En una terminal, cada paso muestra los eventos con una etiqueta de color
-(LLEGADA, SUSPENSION, APROPIACION, FIN, etc.) y tablas con bordes para los
-procesos, la memoria principal, la CPU y las dos colas. Los estados tienen un
-color propio (NUEVO gris, LISTO cian, LISTO/SUSP. amarillo, EJECUCION verde y
-TERMINADO azul). Si la terminal no muestra bien los colores:
+Desde el código fuente (Python 3.8 o superior, sin librerías externas):
 
 ```bash
-python3 main.py --sin-color
+python3 main.py                        # versión completa
+python3 main.py data/lote_1_best_fit.csv
+python3 -m core                        # versión base, solo texto
+python3 -m core data/lote_1_best_fit.csv
 ```
 
-Tambien se respeta la variable de entorno `NO_COLOR`. Si la terminal no
-soporta los caracteres de borde, las tablas se dibujan con `+`, `-` y `|`.
+En Windows se usa `py` en lugar de `python3`.
+
+Opciones de la versión completa: `--sin-color` (sin colores),
+`--pantalla-fija` (limpia la pantalla en cada paso) y `--exportar` (guarda la
+simulación en `resultados/` al terminar).
+
+### Controles
+
+| Versión completa | Versión base | Acción |
+|---|---|---|
+| Espacio / Enter | Enter | Avanza al siguiente cambio |
+| B | — | Vuelve al paso anterior |
+| F | — | Alterna historial y pantalla fija |
+| Q | `q` + Enter | Vuelve al menú |
+| G (al terminar) | — | Guarda la simulación en TXT y HTML |
 
 ## Formato del CSV
 
-Cada linea contiene `id,tamanio,tiempo_arribo,tiempo_irrupcion`, sin encabezado.
-El tamanio se expresa en KB y los tiempos en unidades discretas.
+Una fila por proceso, sin encabezado, con el orden
+`id_proceso,tamanio,t_arribo,t_irrupcion`. Se admiten entre 1 y 10 procesos;
+el tamaño va en KB (1 a 450) y los tiempos son enteros (arribo ≥ 0,
+irrupción > 0).
 
 ```csv
 P1,120,0,8
@@ -93,101 +92,66 @@ P2,150,1,4
 P3,100,2,9
 ```
 
-El simulador admite entre 1 y 10 procesos. Un proceso que requiere mas de
-450K se rechaza antes de iniciar, porque nunca podria alojarse en memoria.
-
 ## Comportamiento
 
-Los estados son `NUEVO`, `LISTO`, `LISTO_SUSPENDIDO`, `EJECUCION` y
-`TERMINADO`. Como maximo cinco procesos pueden estar simultaneamente en
-`LISTO`, `LISTO_SUSPENDIDO` o `EJECUCION`. Un proceso sin cupo permanece en
-`NUEVO`; uno con cupo pero sin hueco de memoria pasa a `LISTO_SUSPENDIDO`.
-
-Los arribos simultaneos se atienden segun el orden del CSV. Al liberar memoria,
-se reintentan primero los suspendidos en orden de llegada y luego los nuevos
-que esperan cupo. La simulacion avanza sin pedir una tecla por unidad y se
-detiene en cada instante con cambios relevantes (llegadas, finalizaciones,
-admisiones, apropiaciones o CPU ociosa).
-
-Cada paso empieza con "COMIENZO DEL PASO" y termina con "FIN DEL PASO", y
-muestra el estado del sistema en el instante del evento (`t`). Dentro del paso
-se informan todas las transiciones con su origen, destino y motivo, por
-ejemplo:
-
-- `P5 llega y pasa a LISTO_SUSPENDIDO (requiere 200K y solo hay 0K libres).`
-- `P5 permanece en LISTO_SUSPENDIDO (... el mayor hueco contiguo es de 150K (fragmentacion externa)).`
-- `P2 apropia la CPU a P1 ... P2 pasa de LISTO a EJECUCION y P1 pasa de EJECUCION a LISTO.`
-
-Las colas muestran el tiempo restante de cada proceso entre parentesis. En la
-tabla de procesos, `T. Irrupcion` es el tiempo de irrupcion original,
-`T. Ejecutado` el tiempo de CPU ya consumido y `T. Restante` el que falta para
-terminar. La tabla de particiones muestra el ID de particion (0 es el SO; cada
-particion recibe un numero al crearse y lo conserva hasta liberarse; los huecos
-libres se muestran con `-`), direccion de comienzo, tamanio, proceso asignado y fragmentacion interna, que
-en MVT es siempre 0K porque cada particion se crea del tamanio exacto del
-proceso.
-
-Al terminar, se presenta el informe estadistico:
-
-- tiempo de retorno = finalizacion - arribo;
-- tiempo de espera = retorno - irrupcion (incluye el tiempo en `NUEVO`,
-  `LISTO_SUSPENDIDO` y `LISTO`);
-- promedios de retorno y espera;
-- tiempo de respuesta = primer instante en CPU - arribo;
-- rendimiento = trabajos terminados / tiempo total de la simulacion.
-
-## Caso de demostracion
-
-`python3 main.py` (o `python3 -m core`) ejecuta los seis procesos de `data/procesos_demo.csv`. Durante
-el recorrido, P2 apropia la CPU en `t = 1`, P5 espera en
-`LISTO_SUSPENDIDO` desde `t = 4` (en `t = 13` hay 230K libres pero
-fragmentados), P6 apropia la CPU en `t = 6` y P5 ingresa a memoria en
-`t = 20`. La ejecucion termina en `t = 31` con los 450K de usuario libres,
-retorno promedio de 14.00 ut, espera promedio de 8.83 ut y rendimiento de
-0.1935 trabajos por unidad de tiempo.
+- **Estados:** `NUEVO`, `LISTO`, `LISTO_SUSPENDIDO`, `EJECUCION` y
+  `TERMINADO` (sin E/S ni `BLOQUEADO`).
+- **Multiprogramación:** como máximo 5 procesos entre `EJECUCION`, `LISTO` y
+  `LISTO_SUSPENDIDO`. Un proceso sin cupo permanece en `NUEVO`; uno con cupo
+  pero sin hueco de memoria pasa a `LISTO_SUSPENDIDO`.
+- **Memoria:** Best-Fit elige el hueco libre más chico donde entra el
+  proceso. Al liberar una partición se fusionan los huecos contiguos y se
+  reintentan primero los suspendidos (en orden de llegada) y luego los nuevos
+  que esperan cupo.
+- **SRTF:** se ejecuta el proceso con menor tiempo restante; una llegada con
+  menor tiempo restante apropia la CPU. Ante un empate, el proceso que ya está
+  en CPU la conserva. Con la CPU libre se elige por menor tiempo restante,
+  luego menor arribo y luego menor ID.
+- **Salida:** en cada paso se muestran los eventos con su motivo, el proceso
+  en CPU, las colas `LISTO` y `LISTO_SUSPENDIDO`, la tabla de procesos y la
+  tabla de particiones (ID, dirección de comienzo, tamaño, proceso y
+  fragmentación interna, que en MVT es siempre 0K).
+- **Informe final:** tiempo de retorno (finalización − arribo) y de espera
+  (retorno − irrupción) de cada proceso, sus promedios, tiempo de respuesta y
+  rendimiento (trabajos terminados / tiempo total).
 
 ## Lotes de prueba
 
-| Archivo | Que muestra |
+| Archivo | Qué muestra |
 |---|---|
-| `procesos_demo.csv` | Apropiacion SRTF, suspension por memoria y fragmentacion externa |
-| `lote_1_best_fit.csv` | Best-Fit elige el hueco mas chico aunque haya uno mas grande antes |
-| `lote_2_cupo_10_procesos.csv` | 10 procesos: cupo de multiprogramacion y memoria llenos |
+| `procesos_demo.csv` | Apropiación SRTF, suspensión por memoria y fragmentación externa |
+| `lote_1_best_fit.csv` | Best-Fit elige el hueco más chico aunque haya uno más grande antes |
+| `lote_2_cupo_10_procesos.csv` | 10 procesos: cupo de multiprogramación y memoria llenos |
 | `lote_3_cpu_ociosa_memoria_exacta.csv` | CPU ociosa entre arribos y un proceso de 450K exactos |
 | `lote_4_empate_srtf.csv` | Empate de tiempo restante: el proceso en CPU la conserva |
 
-## Entrega y ejecutable
-
-`HOWTO.md` es la guia de ejecucion que va en el paquete. Para generar el
-ejecutable y el ZIP de entrega:
-
-```bash
-python3 -m pip install pyinstaller
-python3 empaquetar.py
-```
-
-El script corre las pruebas, genera el ejecutable con PyInstaller
-(`kernelflow.spec`) y deja `entrega/KernelFlow-<sistema>.zip` con el
-ejecutable, la carpeta `data/`, el codigo fuente y el HOWTO. PyInstaller no
-genera ejecutables para otro sistema: el de Linux se arma en Linux.
-`docs/GUIA_INFORME.md` indica que capturar para el informe.
-
-## Estructura
-
-- `core/carga.py` y `core/proceso.py`: lectura y modelo de procesos.
-- `core/memoria.py`: MVT y Best-Fit.
-- `core/estados.py` y `core/admision.py`: transiciones, cupo y colas.
-- `core/planificador.py`: reloj y SRTF apropiativo.
-- `core/estadisticas.py`: retorno, espera, respuesta, promedios y rendimiento.
-- `core/presentacion.py`: salida de texto paso a paso e informe final.
-- `core/main.py`: menu simple y ciclo de la simulacion paso a paso (version base).
-- `interfaz/`: version con colores, tablas con bordes, mapa de memoria,
-  graficos, Gantt, navegacion con una tecla, lista de lotes y exportacion a
-  TXT/HTML. Usa los mismos modulos; no agrega logica de simulacion.
-- `empaquetar.py` y `kernelflow.spec`: ejecutable y paquete de entrega.
+El lote de demostración termina en t = 31 con retorno promedio 14.00 ut,
+espera promedio 8.83 ut y rendimiento 0.1935 trabajos por unidad de tiempo.
 
 ## Pruebas
 
 ```bash
 python3 -m unittest discover -s tests -v
 ```
+
+## Paquete de entrega
+
+```bash
+python3 -m pip install pyinstaller
+python3 empaquetar.py
+```
+
+Corre las pruebas, genera el ejecutable y deja
+`entrega/KernelFlow-<sistema>.zip` con el ejecutable y la carpeta `data/`,
+el código fuente, `HOWTO.txt` y la guía con capturas. PyInstaller no genera
+ejecutables para otro sistema: el de Linux se arma en Linux y el de Windows
+en Windows.
+
+## Documentación
+
+- `docs/HOWTO_KernelFlow_Grupo15.docx`: guía de ejecución con capturas.
+- `docs/Informe_Simulaciones_Grupo15.docx`: capturas de cada paso de los
+  cinco lotes, validaciones y versión base.
+- [Tablero de Trello](https://trello.com/invite/b/660d6768671c589f7fe1ad3c/ATTIfcc43a38988bc5a0fdae81020ef1ac0f450A99A4/so-2026)
+  · [Diagrama de flujo (draw.io)](https://drive.google.com/file/d/1SHgLzj9BOfEBwsSJKS4dxIwl1VEnXMCb/view?usp=sharing)
+  · [Video Sprint 1](https://youtu.be/IwoRyFjnta0)

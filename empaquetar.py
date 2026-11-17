@@ -12,6 +12,7 @@ genera en Linux y el de Windows en Windows. El resultado queda en
 
     KernelFlow-<sistema>/
     |-- HOWTO.txt
+    |-- HOWTO_KernelFlow_Grupo15.docx   (guia con capturas)
     |-- ejecutable/
     |   |-- KernelFlow(.exe)
     |   `-- data/            (lotes CSV y logo)
@@ -102,6 +103,9 @@ def main(argumentos=None) -> int:
             )
 
     shutil.copy2(RAIZ / "HOWTO.md", destino / "HOWTO.txt")
+    guia = RAIZ / "docs" / "HOWTO_KernelFlow_Grupo15.docx"
+    if guia.is_file():
+        shutil.copy2(guia, destino / guia.name)
 
     print("4/4 Comprimiendo...")
     archivo_zip = shutil.make_archive(
