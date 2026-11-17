@@ -7,14 +7,24 @@ from contextlib import redirect_stdout
 from pathlib import Path
 from unittest import mock
 
-from admision import Admision
-from carga import cargar_procesos
-from estilo import Estilo, a_ascii, largo_visible, quitar_colores
-from exportar import ansi_a_html, guardar_simulacion
-from memoria import GestorMemoria
-from panel import PanelConsola, _escala_gantt, _repartir
-from planificador import PlanificadorSRTF
-from proceso import Proceso
+from core import (
+    Admision,
+    cargar_procesos,
+    GestorMemoria,
+    Proceso,
+)
+from interfaz import (
+    a_ascii,
+    ansi_a_html,
+    Estilo,
+    guardar_simulacion,
+    largo_visible,
+    PanelConsola,
+    PlanificadorConGantt,
+    quitar_colores,
+    _escala_gantt,
+    _repartir,
+)
 
 
 def _armar(procesos):
@@ -22,7 +32,7 @@ def _armar(procesos):
     admision = Admision(procesos, memoria)
     panel = PanelConsola(procesos, admision, memoria, Estilo(color=True, unicode=True))
     eventos = []
-    planificador = PlanificadorSRTF(admision, memoria, eventos.append)
+    planificador = PlanificadorConGantt(admision, memoria, eventos.append)
     panel.linea_tiempo = planificador.linea_tiempo
     return panel, planificador, eventos
 
@@ -75,7 +85,7 @@ class TestPanelVisual(unittest.TestCase):
             planificador.ejecutar_unidad()
         planificador.procesar_instante()
         salida = io.StringIO()
-        with redirect_stdout(salida), mock.patch("panel.ancho_terminal", return_value=170):
+        with redirect_stdout(salida), mock.patch("interfaz.ancho_terminal", return_value=170):
             panel.mostrar_paso(eventos, planificador.reloj, 9)
         return quitar_colores(salida.getvalue())
 
@@ -109,7 +119,7 @@ class TestPanelVisual(unittest.TestCase):
         panel, planificador, _ = _armar(procesos)
         planificador.simular()
         salida = io.StringIO()
-        with redirect_stdout(salida), mock.patch("panel.ancho_terminal", return_value=170):
+        with redirect_stdout(salida), mock.patch("interfaz.ancho_terminal", return_value=170):
             panel.mostrar_fin(planificador.reloj)
         texto = quitar_colores(salida.getvalue())
         self.assertIn("Diagrama de Gantt", texto)

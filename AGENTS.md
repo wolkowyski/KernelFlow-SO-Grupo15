@@ -35,49 +35,44 @@ El repositorio parte de una base minima. Antes de agregar funcionalidad:
 
 ## Estructura esperada
 
-La implementacion debe conservar responsabilidades separadas:
+Por pedido de los docentes (revision de la segunda entrega), el codigo se
+separa en dos archivos: el nucleo del TPI y la presentacion extra.
 
 ```text
 kernel-flow/
-├── main.py
-├── proceso.py
-├── carga.py
-├── memoria.py
-├── estados.py
-├── admision.py
-├── planificador.py
-├── presentacion.py
-├── estadisticas.py       # Se incorpora en la segunda entrega
+├── core.py          # TPI base: logica completa + salida de texto simple
+├── interfaz.py      # Colores, tablas, graficos, Gantt y exportacion
+├── empaquetar.py    # Ejecutable y ZIP de entrega
 ├── data/
 │   └── procesos_demo.csv
 ├── tests/
 └── README.md
 ```
 
-Los nombres pueden cambiar solo si existe una razon concreta y se actualizan
-las referencias relacionadas. No mezclar logica de memoria, planificacion,
-entrada de datos y presentacion en `main.py`.
+`core.py` no importa nada de `interfaz.py` y se ejecuta solo
+(`python3 core.py`). `interfaz.py` importa `core.py` y no agrega reglas de
+negocio: solo muestra el estado que el nucleo expone.
 
-## Responsabilidad de cada modulo
+## Responsabilidad de cada seccion de `core.py`
 
-- `proceso.py`: modelo `Proceso`, datos de entrada, estado actual y tiempos
-  necesarios para la simulacion y las estadisticas.
-- `carga.py`: lectura y validacion del CSV. Debe rechazar entradas invalidas
+Cada seccion conserva la responsabilidad que antes tenia su modulo:
+
+- 1. Modelo de proceso: `Proceso`, datos de entrada, estado actual y tiempos
+  necesarios para la simulacion y las estadisticas. Estados y reglas de
+  transicion (`cambiar_estado`), sin decisiones propias del algoritmo SRTF.
+- 2. Carga del CSV: lectura y validacion. Debe rechazar entradas invalidas
   con errores claros y nunca terminar el programa con un traceback evitable.
-- `memoria.py`: MVT, Best-Fit, asignacion, liberacion, reutilizacion y estado
+- 3. Memoria: MVT, Best-Fit, asignacion, liberacion, reutilizacion y estado
   observable de los huecos y particiones.
-- `estados.py`: nombres y reglas de transicion de estados. No debe contener
-  decisiones propias del algoritmo SRTF.
-- `admision.py`: llegada de procesos, limite de multiprogramacion y manejo de
+- 4. Admision: llegada de procesos, limite de multiprogramacion y manejo de
   las colas `NUEVO`, `LISTO` y `LISTO_SUSPENDIDO`.
-- `planificador.py`: reloj, seleccion SRTF, apropiacion, cambios de contexto,
+- 5. Planificador: reloj, seleccion SRTF, apropiacion, cambios de contexto,
   ejecucion y finalizacion.
-- `presentacion.py`: salida de consola y eventos visibles. No debe decidir
+- 6. Estadisticas: calculos de espera, retorno, promedios y rendimiento.
+- 7. Salida de texto: consola y eventos visibles. No debe decidir
   asignaciones de memoria ni seleccionar procesos.
-- `estadisticas.py`: calculos de espera, retorno, promedios y rendimiento;
-  pertenece a la segunda entrega.
-- `main.py`: composicion de dependencias y ciclo principal de la aplicacion,
-  sin concentrar reglas de negocio.
+- 8. Menu y ejecucion: composicion de dependencias y ciclo principal, sin
+  concentrar reglas de negocio.
 
 ## Contratos tecnicos minimos
 

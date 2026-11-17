@@ -43,8 +43,13 @@ Si los colores no se ven bien, ejecute con la opcion --sin-color:
 Requisitos: Python 3.8 o superior. No usa librerias externas.
 
     cd codigo_fuente
-    python3 main.py                          menu interactivo
-    python3 main.py data/lote_1_best_fit.csv simula un archivo directamente
+    python3 interfaz.py                          menu con colores y graficos
+    python3 interfaz.py data/lote_1_best_fit.csv simula un archivo directamente
+    python3 core.py                              version base (solo texto)
+    python3 core.py data/lote_1_best_fit.csv     version base con un archivo
+
+core.py tiene toda la logica del simulador y su salida de texto simple;
+interfaz.py importa core.py y agrega colores, tablas, graficos y exportacion.
 
 En Windows use "py" en lugar de "python3".
 

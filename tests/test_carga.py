@@ -4,8 +4,12 @@ from pathlib import Path
 import tempfile
 import unittest
 
-from carga import ErrorCargaProcesos, cargar_procesos_desde_csv
-from proceso import ESTADO_NUEVO, Proceso
+from core import (
+    ESTADO_NUEVO,
+    cargar_procesos_desde_csv,
+    ErrorCargaProcesos,
+    Proceso,
+)
 
 
 class TestProceso(unittest.TestCase):
@@ -43,7 +47,7 @@ class TestProceso(unittest.TestCase):
 
 
 class TestCargaProcesos(unittest.TestCase):
-    """Verifica los criterios de aceptacion de la HU1 en carga.py."""
+    """Verifica los criterios de aceptacion de la HU1 en core.py."""
 
     def _crear_csv_temporal(self, contenido: str) -> Path:
         directorio = tempfile.TemporaryDirectory()

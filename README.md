@@ -7,16 +7,26 @@ quedan reservados para el sistema operativo.
 
 ## Ejecucion
 
+El programa esta separado en dos archivos:
+
+- `core.py`: el TPI base. Carga, memoria MVT/Best-Fit, admision, SRTF,
+  estadisticas y una salida de texto simple. Se ejecuta solo.
+- `interfaz.py`: importa `core.py` y agrega colores, tablas con bordes,
+  graficos, diagrama de Gantt, navegacion entre pasos y exportacion. No
+  contiene logica de simulacion.
+
 Desde la raiz del proyecto:
 
 ```bash
-python3 main.py
+python3 interfaz.py              # version completa (la del ejecutable)
+python3 core.py                  # version base, solo texto
 ```
 
 Para usar otro archivo:
 
 ```bash
-python3 main.py ruta/al/archivo.csv
+python3 interfaz.py ruta/al/archivo.csv
+python3 core.py ruta/al/archivo.csv
 ```
 
 No se requieren paquetes externos de Python. El archivo predeterminado es
@@ -39,7 +49,7 @@ anterior para revisarlo, `F` alterna entre historial y pantalla fija, y `q`
 vuelve al menu. Al terminar, `G` guarda la simulacion en `resultados/` como
 TXT y HTML con colores (o automaticamente con `--exportar`). La opcion 4 del
 menu (o `--pantalla-fija`) elige el modo de pantalla. Funciona en Linux y
-tambien en Windows (`py main.py`).
+tambien en Windows (`py interfaz.py`).
 
 ## Colores, tablas y graficos
 
@@ -63,7 +73,7 @@ color propio (NUEVO gris, LISTO cian, LISTO/SUSP. amarillo, EJECUCION verde y
 TERMINADO azul). Si la terminal no muestra bien los colores:
 
 ```bash
-python3 main.py --sin-color
+python3 interfaz.py --sin-color
 ```
 
 Tambien se respeta la variable de entorno `NO_COLOR`. Si la terminal no
@@ -125,7 +135,7 @@ Al terminar, se presenta el informe estadistico:
 
 ## Caso de demostracion
 
-`python3 main.py` ejecuta los seis procesos de `data/procesos_demo.csv`. Durante
+`python3 interfaz.py` (o `python3 core.py`) ejecuta los seis procesos de `data/procesos_demo.csv`. Durante
 el recorrido, P2 apropia la CPU en `t = 1`, P5 espera en
 `LISTO_SUSPENDIDO` desde `t = 4` (en `t = 13` hay 230K libres pero
 fragmentados), P6 apropia la CPU en `t = 6` y P5 ingresa a memoria en
@@ -161,17 +171,14 @@ genera ejecutables para otro sistema: el de Linux se arma en Linux.
 
 ## Estructura
 
-- `carga.py` y `proceso.py`: lectura y modelo de procesos.
-- `memoria.py`: MVT y Best-Fit.
-- `estados.py` y `admision.py`: transiciones, cupo y colas.
-- `planificador.py`: reloj y SRTF apropiativo.
-- `estadisticas.py`: retorno, espera, respuesta, promedios y rendimiento.
-- `presentacion.py`: salida de texto simple (sin terminal) e informe final.
-- `panel.py`: panel de la terminal con tablas de procesos, particiones, CPU,
-  cola LISTO y cola LISTO_SUSPENDIDO.
-- `estilo.py`: colores ANSI y tablas con bordes, sin librerias externas.
-- `exportar.py`: guarda la simulacion en TXT y HTML con colores.
-- `main.py`: menu, entrada e integracion de los modulos.
+- `core.py`: nucleo del simulador, dividido en secciones numeradas:
+  1. modelo de proceso y estados; 2. carga del CSV; 3. memoria MVT y
+  Best-Fit; 4. admision y colas; 5. planificador SRTF; 6. informe
+  estadistico; 7. salida de texto; 8. menu y ejecucion.
+- `interfaz.py`: presentacion en la terminal, dividida en: 1. estilo (colores
+  ANSI y tablas con bordes); 2. exportacion a TXT y HTML; 3. linea de tiempo
+  de la CPU para el Gantt; 4. panel con tablas, mapa de memoria y graficos;
+  5. menu, navegacion y ejecucion.
 - `empaquetar.py` y `kernelflow.spec`: ejecutable y paquete de entrega.
 
 ## Pruebas

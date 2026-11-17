@@ -1,12 +1,13 @@
 # -*- mode: python ; coding: utf-8 -*-
 # Configuracion de PyInstaller para generar el ejecutable de KernelFlow.
+# El ejecutable arranca interfaz.py, que importa core.py.
 # Uso: python3 empaquetar.py   (o: python3 -m PyInstaller kernelflow.spec)
 #
 # La carpeta data/ (CSV y logo) NO se mete dentro del ejecutable: se copia al
 # lado para que el usuario pueda ver y agregar sus propios lotes.
 
 a = Analysis(
-    ["main.py"],
+    ["interfaz.py"],
     pathex=[],
     binaries=[],
     datas=[],

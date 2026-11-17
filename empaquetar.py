@@ -26,18 +26,8 @@ from pathlib import Path
 
 RAIZ = Path(__file__).resolve().parent
 ARCHIVOS_FUENTE = (
-    "main.py",
-    "proceso.py",
-    "carga.py",
-    "memoria.py",
-    "estados.py",
-    "admision.py",
-    "planificador.py",
-    "presentacion.py",
-    "panel.py",
-    "estilo.py",
-    "exportar.py",
-    "estadisticas.py",
+    "core.py",
+    "interfaz.py",
     "kernelflow.spec",
     "empaquetar.py",
     "README.md",

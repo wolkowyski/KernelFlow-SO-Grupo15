@@ -2,11 +2,14 @@
 
 import unittest
 
-from admision import Admision
-from estadisticas import calcular_estadisticas
-from memoria import GestorMemoria
-from planificador import PlanificadorSRTF
-from proceso import ESTADO_TERMINADO, Proceso
+from core import (
+    ESTADO_TERMINADO,
+    Admision,
+    calcular_estadisticas,
+    GestorMemoria,
+    PlanificadorSRTF,
+    Proceso,
+)
 
 
 def _simular(procesos):
