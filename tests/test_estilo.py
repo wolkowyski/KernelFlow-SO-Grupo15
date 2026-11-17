@@ -7,12 +7,10 @@ from contextlib import redirect_stdout
 from pathlib import Path
 from unittest import mock
 
-from core import (
-    Admision,
-    cargar_procesos,
-    GestorMemoria,
-    PlanificadorSRTF,
-)
+from admision import Admision
+from carga import cargar_procesos
+from memoria import GestorMemoria
+from planificador import PlanificadorSRTF
 from interfaz import (
     acomodar_en_filas,
     Celda,

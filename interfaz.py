@@ -1,15 +1,17 @@
 """KernelFlow - interfaz de consola con colores, tablas y graficos.
 
-Este archivo NO contiene logica de simulacion. Importa ``core.py`` (donde
-estan la carga del CSV, la memoria MVT/Best-Fit, la admision, el planificador
-SRTF y las estadisticas) y solo cambia la forma de mostrar los resultados:
+Este archivo NO contiene logica de simulacion. Usa los mismos modulos que
+``core.py`` (carga, memoria MVT/Best-Fit, admision, planificador SRTF y
+estadisticas) y solo cambia la forma de mostrar los resultados:
 
     1. Estilo: colores ANSI y tablas con bordes, sin librerias externas
     2. Exportacion de la simulacion a TXT y HTML con colores
     3. Linea de tiempo de la CPU (para el diagrama de Gantt)
     4. Panel de la terminal: tablas, mapa de memoria, decision SRTF,
        barras de progreso, uso de la CPU, grafico de barras y Gantt
-    5. Menu con navegacion entre pasos (B / F / Q) y guardado (G)
+    5. Menu con logo, guia rapida, lista de lotes de data/, explorador de
+       archivos, avance con una sola tecla, navegacion entre pasos
+       (B / F / Q) y guardado (G)
 
 Uso:
 
@@ -37,16 +39,17 @@ import sys
 import textwrap
 from typing import Callable, Dict, List, Optional, Sequence, Tuple, Union
 
+from admision import GRADO_MAXIMO_MULTIPROGRAMACION, Admision, ErrorAdmision
+from carga import ErrorCargaProcesos, cargar_procesos
 from core import (
+    DIRECTORIO_DATOS,
     DIRECTORIO_PROYECTO,
-    ESTADO_EJECUCION,
-    ESTADO_LISTO,
-    ESTADO_LISTO_SUSPENDIDO,
-    ESTADO_NUEVO,
-    ESTADO_TERMINADO,
-    GRADO_MAXIMO_MULTIPROGRAMACION,
     RUTA_CSV_PREDETERMINADA,
-    RUTA_LOGO_UTN,
+    limpiar_pantalla,
+)
+from estadisticas import calcular_estadisticas
+from memoria import GestorMemoria
+from planificador import (
     TIPO_APROPIACION,
     TIPO_ARRIBO,
     TIPO_CPU_OCIOSA,
@@ -55,20 +58,17 @@ from core import (
     TIPO_MEMORIA_LIBERADA,
     TIPO_NUEVA_ADMISION,
     TIPO_SIGUE_SUSPENDIDO,
-    AdministradorAdmision,
-    Admision,
-    ErrorAdmision,
-    ErrorCargaProcesos,
     EventoPlanificador,
-    GestorMemoria,
     PlanificadorSRTF,
-    PresentacionConsola,
+)
+from presentacion import PresentacionConsola
+from proceso import (
+    ESTADO_EJECUCION,
+    ESTADO_LISTO,
+    ESTADO_LISTO_SUSPENDIDO,
+    ESTADO_NUEVO,
+    ESTADO_TERMINADO,
     Proceso,
-    calcular_estadisticas,
-    cargar_procesos,
-    elegir_csv,
-    leer_tecla,
-    limpiar_pantalla,
 )
 
 
@@ -435,7 +435,7 @@ def guardar_simulacion(
 # ============================================================================
 
 class PlanificadorConGantt(PlanificadorSRTF):
-    """El mismo SRTF de ``core.py`` que ademas anota el uso de la CPU.
+    """El mismo SRTF de ``planificador.py`` que ademas anota el uso de la CPU.
 
     ``linea_tiempo[t]`` es el ID del proceso que uso la CPU en [t, t+1), o
     ``None`` si estuvo ociosa. Solo se usa para dibujar el Gantt; no cambia
@@ -511,7 +511,7 @@ class PanelConsola(PresentacionConsola):
     def __init__(
         self,
         procesos: Sequence[Proceso],
-        admision: AdministradorAdmision,
+        admision: Admision,
         memoria: GestorMemoria,
         estilo: Optional[Estilo] = None,
     ) -> None:
@@ -1163,6 +1163,7 @@ def _repartir(tamanios: Sequence[int], total: int, ancho: int, minimo: int) -> L
 # ============================================================================
 
 DIRECTORIO_RESULTADOS = DIRECTORIO_PROYECTO / "resultados"
+RUTA_LOGO_UTN = DIRECTORIO_DATOS / "logo_utn.txt"
 
 # Se define en main() segun la terminal y la opcion --sin-color.
 ESTILO = Estilo()
@@ -1344,6 +1345,139 @@ def mostrar_guia_rapida() -> None:
     imprimir_bloque(guia.strip("\n").splitlines())
 
 
+def leer_tecla() -> str:
+    """Lee una sola tecla sin esperar Enter, en Linux y en Windows.
+
+    Las teclas especiales (flechas, F1, Inicio, etc.) envian varios
+    caracteres seguidos; se leen todos y se devuelve ``""`` para que no
+    se tomen como otra tecla ni queden escritos en la siguiente pregunta.
+    """
+    if os.name == "nt":
+        import msvcrt
+
+        tecla = msvcrt.getwch()
+        if tecla in ("\x00", "\xe0"):  # flechas y teclas de funcion
+            msvcrt.getwch()
+            return ""
+        return tecla
+
+    import select
+    import termios
+    import tty
+
+    descriptor = sys.stdin.fileno()
+    configuracion_anterior = termios.tcgetattr(descriptor)
+    try:
+        tty.setcbreak(descriptor)
+        tecla = os.read(descriptor, 1).decode(errors="ignore")
+        if tecla == "\x1b":  # comienzo de una secuencia de tecla especial
+            while select.select([descriptor], [], [], 0.05)[0]:
+                os.read(descriptor, 32)
+            return ""
+        return tecla
+    finally:
+        termios.tcsetattr(descriptor, termios.TCSADRAIN, configuracion_anterior)
+
+
+def seleccionar_archivo_csv(directorio_inicial: Path) -> Optional[Path]:
+    """Abre un explorador de archivos para elegir un CSV de procesos."""
+    try:
+        import tkinter as tk
+        from tkinter import filedialog
+    except ImportError:
+        print(
+            "No se pudo abrir el explorador: "
+            "falta tkinter en esta instalacion de Python."
+        )
+        return None
+
+    ventana = None
+    try:
+        ventana = tk.Tk()
+        ventana.withdraw()
+        ruta = filedialog.askopenfilename(
+            parent=ventana,
+            title="Seleccionar archivo CSV de procesos",
+            initialdir=str(directorio_inicial),
+            filetypes=(("Archivos CSV", "*.csv"), ("Todos los archivos", "*")),
+        )
+        return Path(ruta) if ruta else None
+    except (tk.TclError, OSError):
+        print(
+            "No se pudo abrir el explorador. "
+            "Verifique que haya un entorno grafico disponible."
+        )
+        return None
+    finally:
+        if ventana is not None:
+            ventana.destroy()
+
+
+def contar_procesos(ruta: Path) -> str:
+    """Cuenta las filas no vacias de un CSV para mostrarlas en la lista."""
+    try:
+        with ruta.open(encoding="utf-8-sig") as archivo:
+            cantidad = sum(1 for linea in archivo if linea.strip())
+    except (OSError, UnicodeDecodeError):
+        return "no se puede leer"
+    return f"{cantidad} proceso(s)"
+
+
+def elegir_csv() -> Optional[Path]:
+    """Muestra los CSV de data/ y permite elegir uno o escribir otra ruta.
+
+    No depende de un entorno grafico; el explorador de archivos queda como
+    opcion adicional para quien tenga tkinter disponible.
+    """
+    archivos = sorted(
+        ruta for ruta in DIRECTORIO_DATOS.glob("*.csv") if ruta.is_file()
+    )
+    while True:
+        limpiar_pantalla()
+        ancho = ancho_terminal()
+        print("=" * ancho)
+        imprimir_centrado("SELECCIONAR ARCHIVO CSV")
+        print("=" * ancho)
+        lineas = []
+        if archivos:
+            ancho_nombre = max(len(ruta.name) for ruta in archivos)
+            for numero, ruta in enumerate(archivos, start=1):
+                lineas.append(
+                    f"[{numero}] {ruta.name:<{ancho_nombre}}  "
+                    f"({contar_procesos(ruta)})"
+                )
+        else:
+            lineas.append(f"No hay archivos CSV en {DIRECTORIO_DATOS}.")
+        lineas.extend((
+            "",
+            "[R] Escribir la ruta de otro archivo CSV",
+            "[E] Buscarlo con el explorador de archivos (requiere entorno grafico)",
+            "[0] Volver al menu",
+        ))
+        imprimir_bloque(lineas)
+        print("-" * ancho)
+
+        opcion = input(centrar_linea("Opcion: ")).strip().lower()
+        if opcion == "0":
+            return None
+        if opcion.isdigit() and 1 <= int(opcion) <= len(archivos):
+            return archivos[int(opcion) - 1]
+        if opcion == "r":
+            texto = input(centrar_linea("Ruta del archivo CSV: "))
+            ruta = Path(texto.strip().strip('"').strip("'")).expanduser()
+            if ruta.is_file():
+                return ruta
+            imprimir_centrado(f"No se encontro el archivo '{ruta}'.")
+        elif opcion == "e":
+            ruta = seleccionar_archivo_csv(DIRECTORIO_DATOS)
+            if ruta is not None:
+                return ruta
+            imprimir_centrado("No se selecciono ningun archivo.")
+        else:
+            imprimir_centrado("Opcion no valida.")
+        input(centrar_linea("Presione Enter para continuar..."))
+
+
 def capturar(funcion: Callable, *argumentos) -> str:
     """Ejecuta una funcion que imprime y retorna lo que imprimio."""
     buffer = io.StringIO()
@@ -1470,7 +1604,6 @@ def menu_interactivo() -> int:
             ruta = RUTA_CSV_PREDETERMINADA
             limpiar_pantalla()
         elif opcion == "2":
-            # La lista de archivos de data/ es la misma de core.py.
             ruta = elegir_csv()
             if ruta is None:
                 continue

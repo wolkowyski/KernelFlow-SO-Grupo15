@@ -48,8 +48,8 @@ Requisitos: Python 3.8 o superior. No usa librerias externas.
     python3 core.py                              version base (solo texto)
     python3 core.py data/lote_1_best_fit.csv     version base con un archivo
 
-core.py tiene toda la logica del simulador y su salida de texto simple;
-interfaz.py importa core.py y agrega colores, tablas, graficos y exportacion.
+core.py es la version base (texto, Enter para avanzar). interfaz.py usa los
+mismos modulos y agrega colores, tablas, graficos y exportacion.
 
 En Windows use "py" en lugar de "python3".
 

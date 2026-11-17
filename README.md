@@ -7,11 +7,11 @@ quedan reservados para el sistema operativo.
 
 ## Ejecucion
 
-El programa esta separado en dos archivos:
+El programa tiene dos puntos de entrada que usan los mismos modulos:
 
-- `core.py`: el TPI base. Carga, memoria MVT/Best-Fit, admision, SRTF,
-  estadisticas y una salida de texto simple. Se ejecuta solo.
-- `interfaz.py`: importa `core.py` y agrega colores, tablas con bordes,
+- `core.py`: el TPI base. Menu simple y simulacion paso a paso en texto
+  (Enter avanza, `q` + Enter vuelve al menu).
+- `interfaz.py`: la version completa, con colores, tablas con bordes,
   graficos, diagrama de Gantt, navegacion entre pasos y exportacion. No
   contiene logica de simulacion.
 
@@ -32,8 +32,11 @@ python3 core.py ruta/al/archivo.csv
 No se requieren paquetes externos de Python. El archivo predeterminado es
 `data/procesos_demo.csv`.
 
-El menu muestra el logo de la UTN y una breve descripcion debajo de cada
-opcion. Al elegir una opcion se limpia la pantalla:
+En `core.py` el menu tiene una descripcion debajo de cada opcion: `[1]`
+simula el CSV de prueba, `[2]` pide la ruta de otro CSV y `[0]` sale.
+
+En `interfaz.py` el menu muestra ademas el logo de la UTN. Al elegir una
+opcion se limpia la pantalla:
 
 - `[1]` simula el CSV de prueba `data/procesos_demo.csv`.
 - `[2]` lista los CSV de `data/` para elegir uno por numero; con `R` se
@@ -171,14 +174,16 @@ genera ejecutables para otro sistema: el de Linux se arma en Linux.
 
 ## Estructura
 
-- `core.py`: nucleo del simulador, dividido en secciones numeradas:
-  1. modelo de proceso y estados; 2. carga del CSV; 3. memoria MVT y
-  Best-Fit; 4. admision y colas; 5. planificador SRTF; 6. informe
-  estadistico; 7. salida de texto; 8. menu y ejecucion.
-- `interfaz.py`: presentacion en la terminal, dividida en: 1. estilo (colores
-  ANSI y tablas con bordes); 2. exportacion a TXT y HTML; 3. linea de tiempo
-  de la CPU para el Gantt; 4. panel con tablas, mapa de memoria y graficos;
-  5. menu, navegacion y ejecucion.
+- `carga.py` y `proceso.py`: lectura y modelo de procesos.
+- `memoria.py`: MVT y Best-Fit.
+- `estados.py` y `admision.py`: transiciones, cupo y colas.
+- `planificador.py`: reloj y SRTF apropiativo.
+- `estadisticas.py`: retorno, espera, respuesta, promedios y rendimiento.
+- `presentacion.py`: salida de texto paso a paso e informe final.
+- `core.py`: menu simple y ciclo de la simulacion paso a paso (version base).
+- `interfaz.py`: version con colores, tablas con bordes, mapa de memoria,
+  graficos, Gantt, navegacion con una tecla, lista de lotes y exportacion a
+  TXT/HTML. Usa los mismos modulos; no agrega logica de simulacion.
 - `empaquetar.py` y `kernelflow.spec`: ejecutable y paquete de entrega.
 
 ## Pruebas

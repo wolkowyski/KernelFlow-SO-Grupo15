@@ -4,12 +4,8 @@ from pathlib import Path
 import tempfile
 import unittest
 
-from core import (
-    ESTADO_NUEVO,
-    cargar_procesos_desde_csv,
-    ErrorCargaProcesos,
-    Proceso,
-)
+from carga import cargar_procesos_desde_csv, ErrorCargaProcesos
+from proceso import ESTADO_NUEVO, Proceso
 
 
 class TestProceso(unittest.TestCase):

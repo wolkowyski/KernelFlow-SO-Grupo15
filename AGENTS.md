@@ -35,44 +35,58 @@ El repositorio parte de una base minima. Antes de agregar funcionalidad:
 
 ## Estructura esperada
 
-Por pedido de los docentes (revision de la segunda entrega), el codigo se
-separa en dos archivos: el nucleo del TPI y la presentacion extra.
+Por pedido de los docentes (revision de la segunda entrega), la version base
+del TPI y la presentacion extra quedan separadas: `core.py` es el punto de
+entrada base y `interfaz.py` el de la version con colores y graficos.
 
 ```text
 kernel-flow/
-├── core.py          # TPI base: logica completa + salida de texto simple
-├── interfaz.py      # Colores, tablas, graficos, Gantt y exportacion
-├── empaquetar.py    # Ejecutable y ZIP de entrega
+├── core.py           # Version base: menu simple y simulacion paso a paso
+├── proceso.py
+├── estados.py
+├── carga.py
+├── memoria.py
+├── admision.py
+├── planificador.py
+├── estadisticas.py
+├── presentacion.py   # Salida de texto de la version base
+├── interfaz.py       # Colores, tablas, graficos, Gantt y exportacion
+├── empaquetar.py     # Ejecutable y ZIP de entrega
 ├── data/
 │   └── procesos_demo.csv
 ├── tests/
 └── README.md
 ```
 
-`core.py` no importa nada de `interfaz.py` y se ejecuta solo
-(`python3 core.py`). `interfaz.py` importa `core.py` y no agrega reglas de
-negocio: solo muestra el estado que el nucleo expone.
+Ningun modulo de la version base importa `interfaz.py`. `interfaz.py` usa
+los mismos modulos y no agrega reglas de negocio: solo muestra el estado que
+exponen. No mezclar logica de memoria, planificacion, entrada de datos y
+presentacion en `core.py`.
 
-## Responsabilidad de cada seccion de `core.py`
+La simulacion siempre avanza paso a paso (lo pide la consigna); no hay un
+modo que la ejecute de corrido. Las pruebas usan `tests/ayudas.py` para
+simular de principio a fin.
 
-Cada seccion conserva la responsabilidad que antes tenia su modulo:
+## Responsabilidad de cada modulo
 
-- 1. Modelo de proceso: `Proceso`, datos de entrada, estado actual y tiempos
-  necesarios para la simulacion y las estadisticas. Estados y reglas de
-  transicion (`cambiar_estado`), sin decisiones propias del algoritmo SRTF.
-- 2. Carga del CSV: lectura y validacion. Debe rechazar entradas invalidas
+- `proceso.py`: modelo `Proceso`, datos de entrada, estado actual y tiempos
+  necesarios para la simulacion y las estadisticas.
+- `carga.py`: lectura y validacion del CSV. Debe rechazar entradas invalidas
   con errores claros y nunca terminar el programa con un traceback evitable.
-- 3. Memoria: MVT, Best-Fit, asignacion, liberacion, reutilizacion y estado
+- `memoria.py`: MVT, Best-Fit, asignacion, liberacion, reutilizacion y estado
   observable de los huecos y particiones.
-- 4. Admision: llegada de procesos, limite de multiprogramacion y manejo de
+- `estados.py`: nombres y reglas de transicion de estados. No debe contener
+  decisiones propias del algoritmo SRTF.
+- `admision.py`: llegada de procesos, limite de multiprogramacion y manejo de
   las colas `NUEVO`, `LISTO` y `LISTO_SUSPENDIDO`.
-- 5. Planificador: reloj, seleccion SRTF, apropiacion, cambios de contexto,
+- `planificador.py`: reloj, seleccion SRTF, apropiacion, cambios de contexto,
   ejecucion y finalizacion.
-- 6. Estadisticas: calculos de espera, retorno, promedios y rendimiento.
-- 7. Salida de texto: consola y eventos visibles. No debe decidir
+- `presentacion.py`: salida de consola y eventos visibles. No debe decidir
   asignaciones de memoria ni seleccionar procesos.
-- 8. Menu y ejecucion: composicion de dependencias y ciclo principal, sin
-  concentrar reglas de negocio.
+- `estadisticas.py`: calculos de espera, retorno, promedios y rendimiento.
+- `core.py`: composicion de dependencias y ciclo principal de la version
+  base, sin concentrar reglas de negocio.
+- `interfaz.py`: presentacion extra (no forma parte de la consigna).
 
 ## Contratos tecnicos minimos
 

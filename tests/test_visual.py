@@ -7,12 +7,10 @@ from contextlib import redirect_stdout
 from pathlib import Path
 from unittest import mock
 
-from core import (
-    Admision,
-    cargar_procesos,
-    GestorMemoria,
-    Proceso,
-)
+from admision import Admision
+from carga import cargar_procesos
+from memoria import GestorMemoria
+from proceso import Proceso
 from interfaz import (
     a_ascii,
     ansi_a_html,

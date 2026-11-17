@@ -5,20 +5,21 @@ import unittest
 from contextlib import redirect_stdout
 from pathlib import Path
 
-from core import (
-    ESTADO_EJECUCION,
-    ESTADO_LISTO_SUSPENDIDO,
-    ESTADO_NUEVO,
-    ESTADO_TERMINADO,
-    GRADO_MAXIMO_MULTIPROGRAMACION,
+from admision import GRADO_MAXIMO_MULTIPROGRAMACION, Admision
+from core import ejecutar_simulacion
+from memoria import GestorMemoria
+from planificador import (
     TIPO_APROPIACION,
     TIPO_ARRIBO,
     TIPO_CPU_OCIOSA,
     TIPO_NUEVA_ADMISION,
-    Admision,
-    ejecutar_simulacion,
-    GestorMemoria,
     PlanificadorSRTF,
+)
+from proceso import (
+    ESTADO_EJECUCION,
+    ESTADO_LISTO_SUSPENDIDO,
+    ESTADO_NUEVO,
+    ESTADO_TERMINADO,
     Proceso,
 )
 from ayudas import avanzar_unidad, simular
