@@ -7,7 +7,7 @@ from contextlib import redirect_stdout
 from pathlib import Path
 
 from core.admision import Admision
-from core.carga import cargar_procesos
+from core.carga import cargar_lote
 from core.memoria import GestorMemoria
 from core.main import ejecutar_simulacion
 from core.planificador import PlanificadorSRTF
@@ -31,7 +31,7 @@ def _modulos_importados(ruta: Path) -> set:
 
 def _resultado(clase_planificador, ruta):
     """Simula un lote y retorna (tiempos por proceso, eventos, reloj final)."""
-    procesos = cargar_procesos(ruta)
+    procesos = cargar_lote(ruta).procesos
     memoria = GestorMemoria()
     admision = Admision(procesos, memoria)
     eventos = []

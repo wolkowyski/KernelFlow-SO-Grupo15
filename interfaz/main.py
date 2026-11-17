@@ -22,7 +22,7 @@ from pathlib import Path
 from typing import Callable, List, Optional, Sequence
 
 from core.admision import Admision, ErrorAdmision
-from core.carga import ErrorCargaProcesos, cargar_procesos
+from core.carga import ErrorCargaProcesos, cargar_lote, describir_avisos
 from core.main import (
     DIRECTORIO_DATOS,
     DIRECTORIO_PROYECTO,
@@ -410,10 +410,24 @@ def ejecutar_simulacion(ruta_csv: Path) -> int:
     aca solo se elige como presentar cada paso.
     """
     try:
-        procesos = cargar_procesos(ruta_csv)
+        resultado = cargar_lote(ruta_csv)
     except ErrorCargaProcesos as error:
         imprimir_centrado(f"Error: {error}")
         return 1
+    procesos = resultado.procesos
+    if resultado.avisos:
+        # Las filas con errores se descartan (nunca se corrigen ni se
+        # inventan datos) y se informa cada una antes de simular.
+        imprimir_centrado(para_pantalla(ESTILO_COMPLETO.c(
+            describir_avisos(resultado), "amarillo", "negrita")))
+        imprimir_bloque([para_pantalla(ESTILO_COMPLETO.c(f"- {aviso}", "amarillo"))
+                         for aviso in resultado.avisos])
+        if sys.stdin.isatty() and sys.stdout.isatty():
+            respuesta = input("\n" + centrar_linea(
+                f"[Enter] simular con los {len(procesos)} proceso(s) validos   "
+                "[q + Enter] volver al menu: "))
+            if respuesta.strip().lower() == "q":
+                return 0
 
     memoria = GestorMemoria()
     try:

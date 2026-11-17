@@ -28,6 +28,8 @@ def leer_tecla() -> str:
         if tecla in ("\x00", "\xe0"):  # flechas y teclas de funcion
             msvcrt.getwch()
             return ""
+        if tecla == "\x03":  # Ctrl+C llega como caracter: se sale limpio
+            raise KeyboardInterrupt
         return tecla
 
     import select

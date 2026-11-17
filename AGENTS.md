@@ -79,6 +79,9 @@ simular de principio a fin.
   necesarios para la simulacion y las estadisticas.
 - `carga.py`: lectura y validacion del CSV. Debe rechazar entradas invalidas
   con errores claros y nunca terminar el programa con un traceback evitable.
+  `cargar_lote` descarta cada fila invalida con un aviso (linea y motivo) y
+  simula las validas; nunca corrige ni inventa datos. Los tiempos tienen un
+  tope (`MAX_TIEMPO`) para que un valor exagerado no cuelgue la simulacion.
 - `memoria.py`: MVT, Best-Fit, asignacion, liberacion, reutilizacion y estado
   observable de los huecos y particiones.
 - `estados.py`: nombres y reglas de transicion de estados. No debe contener

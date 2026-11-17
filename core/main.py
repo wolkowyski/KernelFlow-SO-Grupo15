@@ -27,7 +27,7 @@ import textwrap
 from typing import Optional, Sequence
 
 from core.admision import Admision, ErrorAdmision
-from core.carga import ErrorCargaProcesos, cargar_procesos
+from core.carga import ErrorCargaProcesos, cargar_lote, describir_avisos
 from core.memoria import GestorMemoria
 from core.planificador import PlanificadorSRTF
 from core.presentacion import ANCHO, PresentacionConsola
@@ -93,10 +93,22 @@ def seguir(accion: str) -> bool:
 def ejecutar_simulacion(ruta_csv: Path) -> int:
     """Arma los modulos del simulador y ejecuta la simulacion paso a paso."""
     try:
-        procesos = cargar_procesos(ruta_csv)
+        resultado = cargar_lote(ruta_csv)
     except ErrorCargaProcesos as error:
         print(f"Error: {error}")
         return 1
+    procesos = resultado.procesos
+    interactivo = sys.stdin.isatty() and sys.stdout.isatty()
+    if resultado.avisos:
+        # Las filas con errores se descartan (nunca se corrigen ni se
+        # inventan datos) y se informa cada una antes de simular.
+        print(describir_avisos(resultado))
+        for aviso in resultado.avisos:
+            print(f"  - {aviso}")
+        if interactivo and not seguir(
+            f"simular con los {len(procesos)} proceso(s) validos"
+        ):
+            return 0
 
     memoria = GestorMemoria()
     try:
@@ -110,7 +122,6 @@ def ejecutar_simulacion(ruta_csv: Path) -> int:
     planificador = PlanificadorSRTF(admision, memoria, eventos_paso.append)
     # Si la entrada no es una terminal (por ejemplo, en las pruebas), la
     # simulacion se muestra completa sin esperar teclas.
-    interactivo = sys.stdin.isatty() and sys.stdout.isatty()
 
     presentacion.mostrar_inicio(ruta_csv)
     if interactivo and not seguir("comenzar la simulacion"):

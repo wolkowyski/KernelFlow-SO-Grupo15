@@ -37,11 +37,20 @@ Uso:
 Consideracion sobre los archivos CSV:
     Los datos cargados en cada archivo CSV deben tener este orden
     id_proceso, tamanio, t_arribo, t_irrupcion
-    Una fila por proceso, sin encabezado, entre 1 y 10 procesos.
-    Tamanio en KB (1 a 450); tiempos enteros (arribo >= 0, irrupcion > 0).
+    Una fila por proceso, entre 1 y 10 procesos.
+    Tamanio en KB (1 a 450); tiempos enteros (arribo 0 a 999,
+    irrupcion 1 a 999). Separador "," o ";" (Excel). El encabezado es
+    opcional.
     Ejemplo:
         P1,120,0,8
         P2,150,1,4
+
+    Si una fila tiene un error (letras, negativos, ID repetido, mas de
+    450K, a partir del proceso 11, etc.) se descarta con un aviso que
+    indica la linea y el motivo, y se simulan los procesos validos.
+
+    Los lotes enviados por la catedra estan en data/catedra_lote_1.csv
+    a data/catedra_lote_6.csv.
 
 
 Desde el codigo fuente (carpeta "codigo_fuente", requiere Python 3.8+):
