@@ -7,19 +7,15 @@ from contextlib import redirect_stdout
 from pathlib import Path
 from unittest import mock
 
-from admision import Admision
-from carga import cargar_procesos
-from memoria import GestorMemoria
-from proceso import Proceso
-from interfaz import (
-    a_ascii,
-    ansi_a_html,
-    Estilo,
-    guardar_simulacion,
-    largo_visible,
+from core.admision import Admision
+from core.carga import cargar_procesos
+from core.memoria import GestorMemoria
+from core.proceso import Proceso
+from interfaz.estilo import a_ascii, Estilo, largo_visible, quitar_colores
+from interfaz.exportar import ansi_a_html, guardar_simulacion
+from interfaz.panel import (
     PanelConsola,
     PlanificadorConGantt,
-    quitar_colores,
     _escala_gantt,
     _repartir,
 )
@@ -84,7 +80,7 @@ class TestPanelVisual(unittest.TestCase):
             planificador.ejecutar_unidad()
         planificador.procesar_instante()
         salida = io.StringIO()
-        with redirect_stdout(salida), mock.patch("interfaz.ancho_terminal", return_value=170):
+        with redirect_stdout(salida), mock.patch("interfaz.panel.ancho_terminal", return_value=170):
             panel.mostrar_paso(eventos, planificador.reloj, 9)
         return quitar_colores(salida.getvalue())
 
@@ -118,7 +114,7 @@ class TestPanelVisual(unittest.TestCase):
         panel, planificador, _ = _armar(procesos)
         simular(planificador)
         salida = io.StringIO()
-        with redirect_stdout(salida), mock.patch("interfaz.ancho_terminal", return_value=170):
+        with redirect_stdout(salida), mock.patch("interfaz.panel.ancho_terminal", return_value=170):
             panel.mostrar_fin(planificador.reloj)
         texto = quitar_colores(salida.getvalue())
         self.assertIn("Diagrama de Gantt", texto)

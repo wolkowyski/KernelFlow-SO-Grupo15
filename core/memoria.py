@@ -3,7 +3,7 @@
 from dataclasses import dataclass, field
 from typing import Dict, List, Optional, Tuple, Union
 
-from proceso import Proceso
+from core.proceso import Proceso
 
 MEMORIA_SO_KB = 100
 MEMORIA_USUARIO_KB = 450

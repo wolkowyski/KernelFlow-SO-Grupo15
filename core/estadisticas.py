@@ -13,7 +13,7 @@ Convenciones (unidades de tiempo discretas, ut):
 from dataclasses import dataclass
 from typing import List, Sequence
 
-from proceso import ESTADO_TERMINADO, Proceso
+from core.proceso import ESTADO_TERMINADO, Proceso
 
 
 @dataclass(frozen=True)

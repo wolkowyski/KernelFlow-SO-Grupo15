@@ -2,14 +2,14 @@
 
 import unittest
 
-from memoria import (
+from core.memoria import (
     DIRECCION_INICIO_USUARIO,
     MEMORIA_SO_KB,
     MEMORIA_TOTAL_KB,
     MEMORIA_USUARIO_KB,
     GestorMemoria,
 )
-from proceso import Proceso
+from core.proceso import Proceso
 
 
 class TestGestorMemoria(unittest.TestCase):

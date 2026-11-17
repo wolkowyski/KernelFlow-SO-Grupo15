@@ -3,9 +3,9 @@
 from dataclasses import dataclass
 from typing import Callable, Dict, List, Optional, Sequence
 
-from admision import Admision, Transicion
-from memoria import GestorMemoria
-from proceso import ESTADO_NUEVO, Proceso
+from core.admision import Admision, Transicion
+from core.memoria import GestorMemoria
+from core.proceso import ESTADO_NUEVO, Proceso
 
 
 TIPO_INICIO = "INICIO_EJECUCION"

@@ -5,7 +5,7 @@ import threading
 import unittest
 from unittest import mock
 
-from interfaz import leer_tecla
+from interfaz.entrada import leer_tecla
 
 
 @unittest.skipIf(os.name == "nt", "usa una pseudo-terminal de Linux")
@@ -14,7 +14,7 @@ class TestTeclas(unittest.TestCase):
         self.maestro, self.esclavo = os.openpty()
         entrada = mock.Mock()
         entrada.fileno.return_value = self.esclavo
-        self.parche = mock.patch("interfaz.sys.stdin", entrada)
+        self.parche = mock.patch("interfaz.entrada.sys.stdin", entrada)
         self.parche.start()
 
     def tearDown(self):

@@ -7,17 +7,12 @@ from contextlib import redirect_stdout
 from pathlib import Path
 from unittest import mock
 
-from admision import Admision
-from carga import cargar_procesos
-from memoria import GestorMemoria
-from planificador import PlanificadorSRTF
-from interfaz import (
-    acomodar_en_filas,
-    Celda,
-    Estilo,
-    largo_visible,
-    PanelConsola,
-)
+from core.admision import Admision
+from core.carga import cargar_procesos
+from core.memoria import GestorMemoria
+from core.planificador import PlanificadorSRTF
+from interfaz.estilo import acomodar_en_filas, Celda, Estilo, largo_visible
+from interfaz.panel import PanelConsola
 from ayudas import simular
 
 
@@ -91,7 +86,7 @@ class TestPanel(unittest.TestCase):
 
         salida = io.StringIO()
         with redirect_stdout(salida), mock.patch(
-            "interfaz.ancho_terminal", return_value=200
+            "interfaz.panel.ancho_terminal", return_value=200
         ):
             for _ in range(5):  # hasta t = 4: P5 queda suspendido
                 planificador.procesar_instante()

@@ -1,6 +1,6 @@
 """Punto de entrada del simulador KernelFlow (version base del TPI).
 
-Arma los modulos del simulador y ejecuta la simulacion paso a paso:
+Arma los modulos de esta carpeta y ejecuta la simulacion paso a paso:
 
     proceso.py, estados.py   modelo de proceso y transiciones de estado
     carga.py                 lectura y validacion del CSV
@@ -10,13 +10,13 @@ Arma los modulos del simulador y ejecuta la simulacion paso a paso:
     estadisticas.py          informe estadistico final
     presentacion.py          salida de texto por consola
 
-Uso:
+Uso, desde la raiz del proyecto:
 
-    python3 core.py                    (menu)
-    python3 core.py data/lote.csv      (simula ese archivo)
+    python3 -m core                    (menu)
+    python3 -m core data/lote.csv      (simula ese archivo)
 
-``interfaz.py`` es la version con colores, graficos y exportacion; usa los
-mismos modulos y no cambia la logica de la simulacion.
+La carpeta ``interfaz/`` tiene la version con colores, graficos y
+exportacion; usa estos mismos modulos y no cambia la logica de la simulacion.
 """
 
 import argparse
@@ -26,18 +26,18 @@ import sys
 import textwrap
 from typing import Optional, Sequence
 
-from admision import Admision, ErrorAdmision
-from carga import ErrorCargaProcesos, cargar_procesos
-from memoria import GestorMemoria
-from planificador import PlanificadorSRTF
-from presentacion import ANCHO, PresentacionConsola
+from core.admision import Admision, ErrorAdmision
+from core.carga import ErrorCargaProcesos, cargar_procesos
+from core.memoria import GestorMemoria
+from core.planificador import PlanificadorSRTF
+from core.presentacion import ANCHO, PresentacionConsola
 
 
 if getattr(sys, "frozen", False):
     # Ejecutable de PyInstaller: data/ se distribuye junto al ejecutable.
     DIRECTORIO_PROYECTO = Path(sys.executable).resolve().parent
 else:
-    DIRECTORIO_PROYECTO = Path(__file__).resolve().parent
+    DIRECTORIO_PROYECTO = Path(__file__).resolve().parent.parent
 DIRECTORIO_DATOS = DIRECTORIO_PROYECTO / "data"
 RUTA_CSV_PREDETERMINADA = DIRECTORIO_DATOS / "procesos_demo.csv"
 

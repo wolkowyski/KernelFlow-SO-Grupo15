@@ -4,7 +4,7 @@ import csv
 from pathlib import Path
 from typing import List, Sequence, Union
 
-from proceso import ESTADO_NUEVO, Proceso
+from core.proceso import ESTADO_NUEVO, Proceso
 
 MAX_PROCESOS = 10
 COLUMNAS_ESPERADAS = ("id", "tamanio", "tiempo_arribo", "tiempo_irrupcion")

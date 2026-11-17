@@ -2,11 +2,11 @@
 
 import unittest
 
-from admision import Admision
-from estadisticas import calcular_estadisticas
-from memoria import GestorMemoria
-from planificador import PlanificadorSRTF
-from proceso import ESTADO_TERMINADO, Proceso
+from core.admision import Admision
+from core.estadisticas import calcular_estadisticas
+from core.memoria import GestorMemoria
+from core.planificador import PlanificadorSRTF
+from core.proceso import ESTADO_TERMINADO, Proceso
 from ayudas import simular
 
 

@@ -43,12 +43,12 @@ Si los colores no se ven bien, ejecute con la opcion --sin-color:
 Requisitos: Python 3.8 o superior. No usa librerias externas.
 
     cd codigo_fuente
-    python3 interfaz.py                          menu con colores y graficos
-    python3 interfaz.py data/lote_1_best_fit.csv simula un archivo directamente
-    python3 core.py                              version base (solo texto)
-    python3 core.py data/lote_1_best_fit.csv     version base con un archivo
+    python3 main.py                            menu con colores y graficos
+    python3 main.py data/lote_1_best_fit.csv   simula un archivo directamente
+    python3 -m core                            version base (solo texto)
+    python3 -m core data/lote_1_best_fit.csv   version base con un archivo
 
-core.py es la version base (texto, Enter para avanzar). interfaz.py usa los
+core/ es la version base (texto, Enter para avanzar). interfaz/ usa los
 mismos modulos y agrega colores, tablas, graficos y exportacion.
 
 En Windows use "py" en lugar de "python3".

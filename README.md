@@ -9,33 +9,33 @@ quedan reservados para el sistema operativo.
 
 El programa tiene dos puntos de entrada que usan los mismos modulos:
 
-- `core.py`: el TPI base. Menu simple y simulacion paso a paso en texto
+- `core/`: el TPI base (`python3 -m core`). Menu simple y simulacion paso a paso en texto
   (Enter avanza, `q` + Enter vuelve al menu).
-- `interfaz.py`: la version completa, con colores, tablas con bordes,
+- `interfaz/` (`python3 main.py`): la version completa, con colores, tablas con bordes,
   graficos, diagrama de Gantt, navegacion entre pasos y exportacion. No
   contiene logica de simulacion.
 
 Desde la raiz del proyecto:
 
 ```bash
-python3 interfaz.py              # version completa (la del ejecutable)
-python3 core.py                  # version base, solo texto
+python3 main.py                # version completa (la del ejecutable)
+python3 -m core                 # version base, solo texto
 ```
 
 Para usar otro archivo:
 
 ```bash
-python3 interfaz.py ruta/al/archivo.csv
-python3 core.py ruta/al/archivo.csv
+python3 main.py   ruta/al/archivo.csv
+python3 -m core ruta/al/archivo.csv
 ```
 
 No se requieren paquetes externos de Python. El archivo predeterminado es
 `data/procesos_demo.csv`.
 
-En `core.py` el menu tiene una descripcion debajo de cada opcion: `[1]`
+En la version base el menu tiene una descripcion debajo de cada opcion: `[1]`
 simula el CSV de prueba, `[2]` pide la ruta de otro CSV y `[0]` sale.
 
-En `interfaz.py` el menu muestra ademas el logo de la UTN. Al elegir una
+En la version completa el menu muestra ademas el logo de la UTN. Al elegir una
 opcion se limpia la pantalla:
 
 - `[1]` simula el CSV de prueba `data/procesos_demo.csv`.
@@ -52,7 +52,7 @@ anterior para revisarlo, `F` alterna entre historial y pantalla fija, y `q`
 vuelve al menu. Al terminar, `G` guarda la simulacion en `resultados/` como
 TXT y HTML con colores (o automaticamente con `--exportar`). La opcion 4 del
 menu (o `--pantalla-fija`) elige el modo de pantalla. Funciona en Linux y
-tambien en Windows (`py interfaz.py`).
+tambien en Windows (`py main.py`).
 
 ## Colores, tablas y graficos
 
@@ -76,7 +76,7 @@ color propio (NUEVO gris, LISTO cian, LISTO/SUSP. amarillo, EJECUCION verde y
 TERMINADO azul). Si la terminal no muestra bien los colores:
 
 ```bash
-python3 interfaz.py --sin-color
+python3 main.py --sin-color
 ```
 
 Tambien se respeta la variable de entorno `NO_COLOR`. Si la terminal no
@@ -138,7 +138,7 @@ Al terminar, se presenta el informe estadistico:
 
 ## Caso de demostracion
 
-`python3 interfaz.py` (o `python3 core.py`) ejecuta los seis procesos de `data/procesos_demo.csv`. Durante
+`python3 main.py` (o `python3 -m core`) ejecuta los seis procesos de `data/procesos_demo.csv`. Durante
 el recorrido, P2 apropia la CPU en `t = 1`, P5 espera en
 `LISTO_SUSPENDIDO` desde `t = 4` (en `t = 13` hay 230K libres pero
 fragmentados), P6 apropia la CPU en `t = 6` y P5 ingresa a memoria en
@@ -174,14 +174,14 @@ genera ejecutables para otro sistema: el de Linux se arma en Linux.
 
 ## Estructura
 
-- `carga.py` y `proceso.py`: lectura y modelo de procesos.
-- `memoria.py`: MVT y Best-Fit.
-- `estados.py` y `admision.py`: transiciones, cupo y colas.
-- `planificador.py`: reloj y SRTF apropiativo.
-- `estadisticas.py`: retorno, espera, respuesta, promedios y rendimiento.
-- `presentacion.py`: salida de texto paso a paso e informe final.
-- `core.py`: menu simple y ciclo de la simulacion paso a paso (version base).
-- `interfaz.py`: version con colores, tablas con bordes, mapa de memoria,
+- `core/carga.py` y `core/proceso.py`: lectura y modelo de procesos.
+- `core/memoria.py`: MVT y Best-Fit.
+- `core/estados.py` y `core/admision.py`: transiciones, cupo y colas.
+- `core/planificador.py`: reloj y SRTF apropiativo.
+- `core/estadisticas.py`: retorno, espera, respuesta, promedios y rendimiento.
+- `core/presentacion.py`: salida de texto paso a paso e informe final.
+- `core/main.py`: menu simple y ciclo de la simulacion paso a paso (version base).
+- `interfaz/`: version con colores, tablas con bordes, mapa de memoria,
   graficos, Gantt, navegacion con una tecla, lista de lotes y exportacion a
   TXT/HTML. Usa los mismos modulos; no agrega logica de simulacion.
 - `empaquetar.py` y `kernelflow.spec`: ejecutable y paquete de entrega.

@@ -3,9 +3,9 @@
 from dataclasses import dataclass
 from typing import List, Optional, Sequence
 
-from estados import cambiar_estado
-from memoria import GestorMemoria
-from proceso import (
+from core.estados import cambiar_estado
+from core.memoria import GestorMemoria
+from core.proceso import (
     ESTADO_EJECUCION,
     ESTADO_LISTO,
     ESTADO_LISTO_SUSPENDIDO,

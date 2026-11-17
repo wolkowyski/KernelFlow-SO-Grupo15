@@ -3,11 +3,11 @@
 from pathlib import Path
 from typing import List, Optional, Sequence
 
-from admision import GRADO_MAXIMO_MULTIPROGRAMACION, Admision
-from estadisticas import InformeEstadistico, calcular_estadisticas
-from memoria import GestorMemoria
-from planificador import EventoPlanificador
-from proceso import (
+from core.admision import GRADO_MAXIMO_MULTIPROGRAMACION, Admision
+from core.estadisticas import InformeEstadistico, calcular_estadisticas
+from core.memoria import GestorMemoria
+from core.planificador import EventoPlanificador
+from core.proceso import (
     ESTADO_EJECUCION,
     ESTADO_LISTO_SUSPENDIDO,
     ESTADO_TERMINADO,

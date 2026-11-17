@@ -1,6 +1,6 @@
 """Estados y transiciones permitidas del ciclo de vida de un proceso."""
 
-from proceso import (
+from core.proceso import (
     ESTADO_EJECUCION,
     ESTADO_LISTO,
     ESTADO_LISTO_SUSPENDIDO,

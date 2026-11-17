@@ -36,32 +36,38 @@ El repositorio parte de una base minima. Antes de agregar funcionalidad:
 ## Estructura esperada
 
 Por pedido de los docentes (revision de la segunda entrega), la version base
-del TPI y la presentacion extra quedan separadas: `core.py` es el punto de
-entrada base y `interfaz.py` el de la version con colores y graficos.
+del TPI y la presentacion extra quedan separadas: la carpeta `core/` tiene
+la logica (version base) y `interfaz/` la version con colores y graficos.
 
 ```text
 kernel-flow/
-├── core.py           # Version base: menu simple y simulacion paso a paso
-├── proceso.py
-├── estados.py
-├── carga.py
-├── memoria.py
-├── admision.py
-├── planificador.py
-├── estadisticas.py
-├── presentacion.py   # Salida de texto de la version base
-├── interfaz.py       # Colores, tablas, graficos, Gantt y exportacion
-├── empaquetar.py     # Ejecutable y ZIP de entrega
+├── main.py              # Arranca la version completa (la del ejecutable)
+├── core/                # Logica del TPI (version base): python3 -m core
+│   ├── main.py          # Menu simple y simulacion paso a paso
+│   ├── proceso.py
+│   ├── estados.py
+│   ├── carga.py
+│   ├── memoria.py
+│   ├── admision.py
+│   ├── planificador.py
+│   ├── estadisticas.py
+│   └── presentacion.py  # Salida de texto de la version base
+├── interfaz/            # Presentacion extra: colores, graficos, exportacion
+│   ├── main.py          # Menu completo, navegacion y guardado
+│   ├── estilo.py
+│   ├── panel.py
+│   ├── entrada.py
+│   └── exportar.py
+├── empaquetar.py        # Ejecutable y ZIP de entrega
 ├── data/
-│   └── procesos_demo.csv
 ├── tests/
 └── README.md
 ```
 
-Ningun modulo de la version base importa `interfaz.py`. `interfaz.py` usa
-los mismos modulos y no agrega reglas de negocio: solo muestra el estado que
+Ningun modulo de `core/` importa algo de `interfaz/`. `interfaz/` usa
+los modulos de `core/` y no agrega reglas de negocio: solo muestra el estado que
 exponen. No mezclar logica de memoria, planificacion, entrada de datos y
-presentacion en `core.py`.
+presentacion en `core/main.py`.
 
 La simulacion siempre avanza paso a paso (lo pide la consigna); no hay un
 modo que la ejecute de corrido. Las pruebas usan `tests/ayudas.py` para
@@ -84,9 +90,9 @@ simular de principio a fin.
 - `presentacion.py`: salida de consola y eventos visibles. No debe decidir
   asignaciones de memoria ni seleccionar procesos.
 - `estadisticas.py`: calculos de espera, retorno, promedios y rendimiento.
-- `core.py`: composicion de dependencias y ciclo principal de la version
-  base, sin concentrar reglas de negocio.
-- `interfaz.py`: presentacion extra (no forma parte de la consigna).
+- `core/main.py`: composicion de dependencias y ciclo principal de la
+  version base, sin concentrar reglas de negocio.
+- `interfaz/`: presentacion extra (no forma parte de la consigna).
 
 ## Contratos tecnicos minimos
 

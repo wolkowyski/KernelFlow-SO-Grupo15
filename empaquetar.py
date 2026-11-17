@@ -26,23 +26,14 @@ from pathlib import Path
 
 RAIZ = Path(__file__).resolve().parent
 ARCHIVOS_FUENTE = (
-    "core.py",
-    "proceso.py",
-    "estados.py",
-    "carga.py",
-    "memoria.py",
-    "admision.py",
-    "planificador.py",
-    "estadisticas.py",
-    "presentacion.py",
-    "interfaz.py",
+    "main.py",
     "kernelflow.spec",
     "empaquetar.py",
     "README.md",
     "HOWTO.md",
     "LICENSE",
 )
-CARPETAS_FUENTE = ("data", "tests", "docs")
+CARPETAS_FUENTE = ("core", "interfaz", "data", "tests", "docs")
 
 
 def _nombre_sistema() -> str:
