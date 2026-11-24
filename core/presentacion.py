@@ -106,8 +106,17 @@ class PresentacionConsola:
         print()
         print(self.tabla_procesos())
         print()
-        print("Memoria: 100K para el SO + 450K para usuario (MVT, Best-Fit).")
-        print("Planificacion: SRTF apropiativo. Multiprogramacion maxima: 5.")
+        print(
+            f"Memoria: {self.memoria.memoria_so_kb}K para el SO + "
+            f"{self.memoria.memoria_usuario_kb}K para usuario (MVT, Best-Fit)."
+        )
+        print(
+            "Planificacion: SRTF apropiativo. Multiprogramacion maxima: "
+            f"{GRADO_MAXIMO_MULTIPROGRAMACION}."
+        )
+        # >> Los numeros salen de la memoria y de la constante de admision
+        #    (f-string: lo que va entre llaves se reemplaza por su valor).
+        #    Si se cambia el grado o la memoria, este texto se actualiza solo.
 
     def mostrar_paso(
         self, eventos: Sequence[EventoPlanificador], tiempo: int, numero: int

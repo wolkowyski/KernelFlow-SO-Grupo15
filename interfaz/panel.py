@@ -154,10 +154,13 @@ class PanelConsola(PresentacionConsola):
         imprimir_bloque(self._mapa_memoria())
         print()
         imprimir_bloque((
-            e.c("Memoria:", "negrita") + " 100K para el SO + 450K para usuario"
+            e.c("Memoria:", "negrita")
+            + f" {self.memoria.memoria_so_kb}K para el SO + "
+            f"{self.memoria.memoria_usuario_kb}K para usuario"
             " (particiones variables MVT, Best-Fit)",
             e.c("CPU:", "negrita") + " SRTF apropiativo   "
-            + e.c("Multiprogramacion maxima:", "negrita") + " 5",
+            + e.c("Multiprogramacion maxima:", "negrita")
+            + f" {GRADO_MAXIMO_MULTIPROGRAMACION}",
         ))
 
     def mostrar_paso(
