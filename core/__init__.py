@@ -1,3 +1,12 @@
+# =============================================================================
+#  __init__.py  -  CONVIERTE LA CARPETA "core" EN UN PAQUETE DE PYTHON
+# -----------------------------------------------------------------------------
+#  Copia COMENTADA. El codigo es IDENTICO al entregado.
+# -----------------------------------------------------------------------------
+#  Python trata como "paquete" a una carpeta que tiene __init__.py. Gracias a
+#  eso, los otros archivos pueden escribir "from core.memoria import ...".
+#  Este no tiene codigo: solo un texto (docstring) que describe la carpeta.
+# =============================================================================
 """Logica del simulador KernelFlow: la version base del TPI.
 
     proceso.py, estados.py   modelo de proceso y transiciones de estado
