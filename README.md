@@ -1,5 +1,10 @@
 # KernelFlow
 
+[![Tests](https://github.com/wolkowyski/KernelFlow-SO-Grupo15/actions/workflows/tests.yml/badge.svg)](https://github.com/wolkowyski/KernelFlow-SO-Grupo15/actions/workflows/tests.yml)
+[![Python](https://img.shields.io/badge/Python-3.8%2B-3776AB?logo=python&logoColor=white)](https://www.python.org/)
+[![Plataformas](https://img.shields.io/badge/plataformas-Linux%20%7C%20Windows-555)](#compatibilidad)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
 Simulador de asignación de memoria y planificación de procesos por consola,
 desarrollado en Python 3 para el TPI de **Sistemas Operativos** (UTN Facultad
 Regional Resistencia, 2026, Comisión K 2.1 Turno Tarde, **Grupo 15**).
@@ -16,10 +21,12 @@ Valentin · Wolkowyski, Braian Leonel · Zurano Lang, Lucas Maximiliano.
 
 ## Descargas (entrega final)
 
+Los paquetes están en el [release v1.0](https://github.com/wolkowyski/KernelFlow-SO-Grupo15/releases/tag/v1.0).
+
 | Archivo | Qué es |
 |---|---|
-| [`descargas/KernelFlow-linux.zip`](descargas/KernelFlow-linux.zip) | Ejecutable para **Linux** + lotes de prueba + código fuente + HOWTO |
-| [`descargas/KernelFlow-windows.zip`](descargas/KernelFlow-windows.zip) | Ejecutable para **Windows 10/11** + lo mismo |
+| [`KernelFlow-linux.zip`](https://github.com/wolkowyski/KernelFlow-SO-Grupo15/releases/download/v1.0/KernelFlow-linux.zip) | Ejecutable para **Linux** + lotes de prueba + código fuente + HOWTO |
+| [`KernelFlow-windows.zip`](https://github.com/wolkowyski/KernelFlow-SO-Grupo15/releases/download/v1.0/KernelFlow-windows.zip) | Ejecutable para **Windows 10/11** + lo mismo |
 | [`docs/Informe_Simulaciones_Grupo15.docx`](docs/Informe_Simulaciones_Grupo15.docx) | Informe con capturas de todos los lotes |
 | [`docs/HOWTO_KernelFlow_Grupo15.docx`](docs/HOWTO_KernelFlow_Grupo15.docx) | Guía de ejecución con capturas |
 | [`HOWTO.md`](HOWTO.md) | Guía rápida de ejecución (texto) |
@@ -53,9 +60,9 @@ kernel-flow/
 ├── data/                # Lotes de prueba
 ├── tests/               # Pruebas automáticas
 ├── docs/                # HOWTO e informe con capturas (Word)
+│   └── desarrollo/      #   guía de desarrollo e historias de usuario
 ├── empaquetar.py        # Genera el ejecutable y el ZIP de entrega
-├── kernelflow.spec      # Configuración de PyInstaller
-└── descargas/           # Paquetes de entrega listos (Linux y Windows)
+└── kernelflow.spec      # Configuración de PyInstaller
 ```
 
 ### Por qué está dividido en `core/` e `interfaz/`
@@ -202,6 +209,8 @@ el lote 6, P11 y P12 (la consigna permite como máximo 10 procesos).
 python3 -m unittest discover -s tests -v
 ```
 
+GitHub Actions las corre en cada push, en Linux y en Windows, con Python 3.8 y 3.13.
+
 Además de las pruebas de cada módulo:
 
 - **Simulador de referencia** (`tests/test_robustez.py`): un segundo
@@ -241,7 +250,22 @@ en Windows.
 - `docs/HOWTO_KernelFlow_Grupo15.docx`: guía de ejecución con capturas.
 - `docs/Informe_Simulaciones_Grupo15.docx`: capturas de cada paso de los
   cinco lotes, validaciones y versión base.
-- [Repositorio en GitHub](https://github.com/wolkowyski/KernelFlow-SO-Grupo15)
-- [Tablero de Trello](https://trello.com/invite/b/660d6768671c589f7fe1ad3c/ATTIfcc43a38988bc5a0fdae81020ef1ac0f450A99A4/so-2026)
-  · [Diagrama de flujo (draw.io)](https://drive.google.com/file/d/1SHgLzj9BOfEBwsSJKS4dxIwl1VEnXMCb/view?usp=sharing)
-  · [Video Sprint 1](https://youtu.be/IwoRyFjnta0)
+- `docs/GUIA_INFORME.md`: cómo se armó el informe.
+
+## Proceso de desarrollo
+
+El equipo trabajó por sprints, con historias de usuario y un tablero de Trello (privado del equipo).
+
+- [`docs/desarrollo/HU1.md`](docs/desarrollo/HU1.md): HU-01, carga de procesos desde CSV.
+- [`docs/desarrollo/HU2.md`](docs/desarrollo/HU2.md): HU-02, asignación de memoria con MVT y Best-Fit.
+- [`docs/desarrollo/AGENTS.md`](docs/desarrollo/AGENTS.md): guía técnica del repositorio (reglas de la consigna, estructura y convenciones).
+- [Diagrama de flujo (draw.io)](https://drive.google.com/file/d/1SHgLzj9BOfEBwsSJKS4dxIwl1VEnXMCb/view?usp=sharing)
+- [Video del Sprint 1](https://youtu.be/IwoRyFjnta0)
+
+## Licencia
+
+[MIT](LICENSE).
+
+---
+
+Parte del portafolio de [Braian Wolkowyski](https://github.com/wolkowyski).
