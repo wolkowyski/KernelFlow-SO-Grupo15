@@ -209,7 +209,7 @@ el lote 6, P11 y P12 (la consigna permite como máximo 10 procesos).
 python3 -m unittest discover -s tests -v
 ```
 
-GitHub Actions las corre en cada push, en Linux y en Windows, con Python 3.8 y 3.13.
+GitHub Actions las corre en cada push: en Linux y en Windows con Python 3.13, y en Windows también con 3.8, la versión mínima.
 
 Además de las pruebas de cada módulo:
 
